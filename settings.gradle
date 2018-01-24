@@ -1,0 +1,19 @@
+rootProject.name = 'grapes'
+
+//core
+include ':core'
+
+//modules
+include ':common'
+
+include ':music'
+include ':deploy'
+
+
+
+//module paths
+project(':common').projectDir = "$rootDir/modules/common" as File
+
+project(':music').projectDir = "$rootDir/modules/music" as File
+project(':deploy').projectDir = "$rootDir/modules/deploy" as File
+

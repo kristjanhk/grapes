@@ -1,0 +1,110 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'com.esyfur', name: 'gradle-config-plugin', version: '0.4.5'
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+    }
+}
+
+plugins {
+    id 'org.hidetake.ssh' version '2.9.0'
+}
+
+apply plugin: 'config'
+
+subprojects {
+    apply plugin: 'application'
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: "com.github.johnrengelman.shadow"
+    group 'eu.kyngas.grapes'
+    targetCompatibility = cfg.ver.java
+    sourceCompatibility = cfg.ver.java
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    shadowJar {
+        baseName = 'grapes'
+    }
+    dependencies {
+        compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: "${cfg.ver.lombok}"
+
+        testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
+    }
+    sourceSets {
+        main {
+            java {
+                srcDirs = ["${cfg.dir.main.java}"]
+            }
+            resources {
+                srcDirs = ["${cfg.dir.main.resources}"]
+            }
+        }
+        test {
+            java {
+                srcDirs = ["${cfg.dir.test.java}"]
+            }
+            resources {
+                srcDirs = ["${cfg.dir.test.resources}"]
+            }
+        }
+    }
+    idea {
+        module {
+            generatedSourceDirs += file("${cfg.dir.main.gen}")
+            outputDir = file("${projectDir}${cfg.dir.build.main}")
+            testOutputDir = file("${projectDir}${cfg.dir.build.test}")
+        }
+    }
+    task proxyGen(type: JavaCompile) {
+        source = sourceSets.main.java
+        classpath = configurations.compile + configurations.compileOnly
+        destinationDir = project.file("${cfg.dir.main.gen}")
+        options.compilerArgs = [
+                '-proc:only',
+                '-processor',
+                'io.vertx.codegen.CodeGenProcessor',
+                "-Acodegen.output=${project.projectDir}${cfg.dir.main.gen}",
+                "-Acodegen.generators=${cfg.codegen.processors}"
+        ]
+    }
+    compileJava {
+        options.encoding = 'UTF-8'
+        dependsOn proxyGen
+        //todo dependsOn webpack compilation (npm run prod)
+    }
+    task proxyClean(type: Delete) {
+        delete "${cfg.dir.main.gen}"
+    }
+    clean.dependsOn proxyClean
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "${cfg.ver.gradle}"
+    //noinspection UnnecessaryQualifiedReference
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+/*
+sourceSets {
+    main {
+        java {
+            srcDirs = []
+        }
+        resources {
+            srcDirs = []
+        }
+    }
+    test {
+        java {
+            srcDirs = []
+        }
+        resources {
+            srcDirs = []
+        }
+    }
+}*/

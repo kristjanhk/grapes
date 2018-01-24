@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':common')
+
+    compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
+}
+
+mainClassName = 'eu.kyngas.grapes.core.Launcher'
+
+shadowJar {
+    classifier = 'core'
+}

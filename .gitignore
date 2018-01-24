@@ -1,0 +1,17 @@
+syntax: glob
+
+/.gradle/
+/gradle/
+gradlew
+gradlew.bat
+
+/.idea/modules/
+/.idea/libraries/
+/.idea/uiDesigner.xml
+/.idea/.name
+/.idea/workspace.xml
+/.idea/modules.xml
+
+/.vertx/
+*gen/
+
