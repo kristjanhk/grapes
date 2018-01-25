@@ -47,6 +47,6 @@ public class Launcher {
   }
 
   private static boolean isRunningAsServer(String[] args) {
-    return args.length == 0 || args.length == 1 && Eq.eq(args[0], "c", "client");
+    return args.length == 0 || (args.length == 1 && !Eq.eq(args[0], "c", "client"));
   }
 }

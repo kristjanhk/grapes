@@ -26,7 +26,8 @@ public class MusicClientVerticle extends AbstractVerticle {
   }
 
   private void connect(SourceDataLine sourceDataLine) {
-    client.websocket(new RequestOptions().setHost("kyngas.eu").setPort(443).setSsl(false).setURI("/ws"), socket -> {
+    // TODO: 25.01.2018 read config from file
+    client.websocket(new RequestOptions().setHost("kyngas.eu").setPort(443).setSsl(true).setURI("/ws"), socket -> {
       log.info("Connected to server");
       socket.handler(buffer -> {
         byte[] bytes = buffer.getBytes();

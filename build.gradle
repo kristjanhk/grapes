@@ -28,12 +28,13 @@ subprojects {
     }
     shadowJar {
         baseName = 'grapes'
+        //todo shadowJar compile fat jars to global folder -> easy access
     }
     dependencies {
         compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${cfg.ver.lombok}"
 
-        compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: "${cfg.ver.logback}"
 
         testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
     }
@@ -91,6 +92,7 @@ task wrapper(type: Wrapper) {
     distributionType = Wrapper.DistributionType.ALL
 }
 
+//todo needed for excluding root module?
 /*
 sourceSets {
     main {
