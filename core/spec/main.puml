@@ -1,0 +1,208 @@
+@startuml
+
+package Frontend {
+    node CSS {
+        [Antd]
+        [SemanticUI]
+    }
+    node UI {
+        [React]
+        [Redux]
+    }
+    node RestRequests {
+        [Axios]
+    }
+    node Websocket {
+        [Sockjs]
+        [Proxies]
+    }
+}
+
+package System {
+    node Firewall
+    node SystemD
+    node MailServer
+    node SSH
+    node VNC
+
+    package Backend {
+        cloud Eventbus
+        cloud Rest
+        node GatewayModule {
+            [AcmeService]
+            [StaticFiles]
+            node GatewayVerticle
+        }
+        node AuthModule {
+            node AuthVerticle [
+                AuthVerticle
+                Pac4j
+            ]
+            [AuthorizerService]
+            [PasswordAuth]
+            [IdCardAuth]
+            [FacebookOAuth]
+            [GoogleOAuth]
+        }
+        node DatabaseModule {
+            node DatabaseVerticle [
+                DatabaseVerticle
+                JOOQ
+            ]
+            [DatabaseService]
+            [Liquibase]
+        }
+        node MusicModule {
+            node MusicVerticle
+            [MusicService]
+        }
+        node MailModule {
+            node MailVerticle
+            [MailService]
+        }
+        node DownloadModule {
+            node DownloadVerticle
+            [DownloadService]
+        }
+        node RemoteControlModule {
+            node RemoteControlVerticle
+            [RemoteControlService]
+        }
+        node RemoteBusModule {
+            node RemoteBusVerticle
+            [RemoteBusService]
+        }
+        node DeploymentModule {
+            [DeployerService]
+            node DeployerVerticle
+        }
+    }
+
+    package Database {
+        database DB [
+            Mysql
+            ---
+            Postgresql?
+            ---
+            Oracle?
+            ---
+            Testing (H2?)
+        ]
+    }
+}
+
+package Local {
+    node BuildTools {
+        component Compiler [
+            NPM / Yarn
+        ]
+    }
+    actor Admin
+}
+
+database Facebook
+database Google
+database LetsEncrypt
+database Web [
+    HTTP
+    ---
+    P2P
+    ---
+    Usenet
+]
+database Music [
+    Spotify
+    ---
+    Soundcloud
+    ---
+    Youtube
+]
+database Mail
+database ServerCluster
+
+actor User
+actor Request
+
+
+'''Frontend'''
+'Sockjs ..> Firewall : Websocket
+Proxies -> Sockjs
+'Axios ..> Firewall : Rest
+
+User --> React
+React --> Axios
+React -> Proxies
+Redux -> React
+
+
+Compiler -u---> React
+SemanticUI -up-> React
+Antd -up-> React
+Compiler <.down. Admin : Build frontend
+
+'''System'''
+Request --> Firewall : HTTPS 443
+Firewall -> SystemD
+SystemD --> GatewayVerticle : HTTPS 8443
+
+'''Backend'''
+Rest <-> Eventbus
+
+'GatewayModule'
+GatewayVerticle --> AuthVerticle
+GatewayVerticle -> Eventbus
+AcmeService .up...> LetsEncrypt
+
+
+'AuthModule'
+AuthVerticle --> FacebookOAuth
+GoogleOAuth <- AuthVerticle
+AuthVerticle -> IdCardAuth
+AuthVerticle --> PasswordAuth
+AuthVerticle --> AuthorizerService
+AuthorizerService ---> Eventbus
+FacebookOAuth .left.> Facebook
+GoogleOAuth .left.> Google
+
+'DatabaseModule'
+DatabaseVerticle -down----> Eventbus
+DatabaseVerticle -right-> DatabaseService
+DatabaseService ..> DB
+Admin .> Liquibase : Propagate
+Liquibase .> DB
+
+'MusicModule'
+MusicVerticle -up-> Eventbus
+MusicVerticle --> MusicService
+MusicService ...> Music
+
+'DownloadModule'
+DownloadVerticle -up-> Eventbus
+DownloadVerticle --> DownloadService
+DownloadService ...> Web
+
+'RemoteControlModule'
+RemoteControlVerticle -up-> Eventbus
+RemoteControlVerticle --> RemoteControlService
+RemoteControlService --> SSH : 22
+RemoteControlService --> VNC : 590x
+
+'RemoteBusModule'
+RemoteBusVerticle -up-> Eventbus
+RemoteBusVerticle --> RemoteBusService
+RemoteBusService ...> ServerCluster : Websocket / SSL
+
+'MailModule'
+MailVerticle -up-> Eventbus
+MailVerticle --> MailService
+MailService --> MailServer
+MailServer ..> Mail : 21
+
+'DeploymentModule'
+DeployerVerticle -up-> Eventbus
+DeployerVerticle --> DeployerService
+Admin .> DeployerService : Re/Deploy
+
+
+
+@enduml

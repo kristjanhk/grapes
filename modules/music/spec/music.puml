@@ -1,0 +1,46 @@
+@startuml
+
+package Server {
+    node Pulseaudio
+    node SpotifyLocalClient
+
+    package Backend {
+        cloud Eventbus
+        node MusicModule {
+            node MusicVerticle
+            [MusicService]
+        }
+    }
+}
+
+package Spotify {
+    database SpotifyService
+    node SpotifyWebApi
+}
+
+database Youtube
+database Soundcloud
+
+actor Android
+actor Webplayer
+
+
+SpotifyLocalClient <.up. SpotifyService : issue cmds (play/stop)
+SpotifyLocalClient -> Pulseaudio : play audio locally
+Pulseaudio --> MusicVerticle : stream audio over network
+MusicVerticle -> MusicService
+Eventbus <- MusicVerticle
+
+Youtube .up.> MusicVerticle
+Soundcloud .up.> MusicVerticle
+
+MusicService --> SpotifyLocalClient : Start app
+MusicService .> SpotifyWebApi : issue user cmds
+SpotifyWebApi --> SpotifyService
+
+MusicService <.> Android : cmds | stream audio ws
+MusicService <..> Webplayer : cmds | stream audio ws
+
+
+
+@enduml
