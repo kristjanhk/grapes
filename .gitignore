@@ -16,3 +16,4 @@ gradlew.bat
 *gen/
 
 /.idea/compiler.xml
+/output/
