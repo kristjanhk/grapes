@@ -1,5 +1,6 @@
 dependencies {
     compile project(':common')
+    compile project(':music')
 
     compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
 }

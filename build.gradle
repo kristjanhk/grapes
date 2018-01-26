@@ -28,7 +28,7 @@ subprojects {
     }
     shadowJar {
         baseName = 'grapes'
-        //todo shadowJar compile fat jars to global folder -> easy access
+        destinationDir = file("$rootDir/output")
     }
     dependencies {
         compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
