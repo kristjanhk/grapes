@@ -21,7 +21,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import lombok.extern.slf4j.Slf4j;
-import static eu.kyngas.grapes.common.util.ConfigUtil.isRunningFromJar;
+import static eu.kyngas.grapes.common.util.Config.isRunningFromJar;
+import static eu.kyngas.grapes.common.util.Network.DEFAULT_HTTP_HOST;
+import static eu.kyngas.grapes.common.util.Network.HTTP_HOST;
+import static eu.kyngas.grapes.common.util.Network.HTTP_PORT;
+import static eu.kyngas.grapes.music.Launcher.DEFAULT_HTTP_PORT;
 import static eu.kyngas.grapes.music.util.AudioUtil.MIXER_INDEX;
 
 /**
@@ -48,16 +52,16 @@ public class MusicVerticle extends AbstractVerticle {
 
     String staticFilesPath = isRunningFromJar() ? STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString();
     router.get(STATIC_PATH).handler(StaticHandler.create(staticFilesPath)
-        .setCachingEnabled(false)
-        .setIncludeHidden(false)
-        .setDirectoryListing(true));
-
+                                                 .setCachingEnabled(false)
+                                                 .setIncludeHidden(false)
+                                                 .setDirectoryListing(true));
 
     router.get("/ws").handler(ctx -> startAudioTransfer(ctx.request().upgrade()));
     server = vertx.createHttpServer()
-        .requestHandler(router::accept)
-        .listen(8080, "localhost", handleServerStarted(future));
-    // TODO: 25.01.2018 read config from file
+                  .requestHandler(router::accept)
+                  .listen(config().getInteger(HTTP_PORT, DEFAULT_HTTP_PORT),
+                          config().getString(HTTP_HOST, DEFAULT_HTTP_HOST),
+                          handleServerStarted(future));
   }
 
   private Handler<AsyncResult<HttpServer>> handleServerStarted(Future<Void> future) {
@@ -100,8 +104,9 @@ public class MusicVerticle extends AbstractVerticle {
     in.exceptionHandler(thr -> log.error("Exception in audio input", thr));
     // TODO: 27.01.2018 try to clear queue to sync?
     in.handler(buffer -> sockets.values().forEach(ws -> C.check(!ws.writeQueueFull(),
-        () -> ws.write(buffer),
-        () -> log.debug("Client {}: write queue full", socket.textHandlerID()))));
+                                                                () -> ws.write(buffer),
+                                                                () -> log.debug("Client {}: write queue full",
+                                                                                socket.textHandlerID()))));
   }
 
   private void handleClientDisconnect(ServerWebSocket socket) {

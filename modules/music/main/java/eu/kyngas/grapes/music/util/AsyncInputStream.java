@@ -54,7 +54,7 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
     }
     if (sleepBetweenReadsMillis < 0) {
       throw new IllegalArgumentException(String.format("sleepBetweenReadsMillis: %s (expected >= 0)",
-          sleepBetweenReadsMillis));
+                                                       sleepBetweenReadsMillis));
     }
     this.vertx = vertx;
     this.executor = executor;

@@ -5,6 +5,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import java.util.function.Consumer;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -21,6 +22,10 @@ public class Ctx {
 
   public static Vertx vertx() {
     return ctx().owner();
+  }
+
+  public static void createVertx(Consumer<Vertx> consumer) {
+    N.safe(consumer, c -> c.accept(Vertx.vertx()));
   }
 
   public static Vertx async(Runnable task) {

@@ -5,7 +5,6 @@ import eu.kyngas.grapes.common.util.N;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,7 +26,7 @@ public class CircularQueue<T> {
     }
     if (minSize >= maxSize) {
       throw new IllegalArgumentException(String.format("minSize %s >= maxSize %s (expected minSize <= maxSize)",
-          minSize, maxSize));
+                                                       minSize, maxSize));
     }
     this.minSize = minSize;
     this.maxSize = maxSize;

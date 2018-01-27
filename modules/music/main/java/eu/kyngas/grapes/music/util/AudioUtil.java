@@ -16,10 +16,10 @@ public class AudioUtil {
 
   public static AudioFormat getAudioFormat() {
     return new AudioFormat(44100,
-        16,
-        2,
-        true,
-        false);
+                           16,
+                           2,
+                           true,
+                           false);
   }
 
   public static SourceDataLine startAudioPlayback(int mixerIndex) throws LineUnavailableException {
