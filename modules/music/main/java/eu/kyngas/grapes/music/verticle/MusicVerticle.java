@@ -29,6 +29,7 @@ import static eu.kyngas.grapes.music.util.AudioUtil.MIXER_INDEX;
  */
 @Slf4j
 public class MusicVerticle extends AbstractVerticle {
+  private static final int DEFAULT_QUEUE_SIZE = 8192;
   private static final Path RESOURCES = Paths.get("src/main/resources");
   private static final String STATIC_PATH = "/static/*";
   private static final String STATIC_FOLDER = "static";
@@ -45,7 +46,6 @@ public class MusicVerticle extends AbstractVerticle {
     mixerIndex = config().getInteger(MIXER_INDEX);
     Router router = Router.router(vertx);
 
-    // TODO: 25.01.2018 audio playback from browser
     String staticFilesPath = isRunningFromJar() ? STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString();
     router.get(STATIC_PATH).handler(StaticHandler.create(staticFilesPath)
         .setCachingEnabled(false)
@@ -76,6 +76,7 @@ public class MusicVerticle extends AbstractVerticle {
     socket.closeHandler(v -> handleClientDisconnect(socket));
 
     sockets.put(socket.textHandlerID(), socket);
+    socket.setWriteQueueMaxSize(DEFAULT_QUEUE_SIZE);
     if (sockets.size() > 1) {
       log.info("Client {} connected -- reusing recording thread", socket.textHandlerID());
       return;
@@ -97,14 +98,10 @@ public class MusicVerticle extends AbstractVerticle {
       sockets.values().forEach(WebSocketBase::close);
     }));
     in.exceptionHandler(thr -> log.error("Exception in audio input", thr));
-    in.handler(buffer -> sockets.values().forEach(ws -> {
-      if (!ws.writeQueueFull()) {
-        // TODO: 25.01.2018 use queuing buffer, vertx stream improvements
-        ws.write(buffer);
-      } else {
-        log.debug("Client {}: write queue full", socket.textHandlerID());
-      }
-    }));
+    // TODO: 27.01.2018 try to clear queue to sync?
+    in.handler(buffer -> sockets.values().forEach(ws -> C.check(!ws.writeQueueFull(),
+        () -> ws.write(buffer),
+        () -> log.debug("Client {}: write queue full", socket.textHandlerID()))));
   }
 
   private void handleClientDisconnect(ServerWebSocket socket) {
