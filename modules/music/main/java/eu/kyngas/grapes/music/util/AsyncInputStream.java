@@ -12,7 +12,6 @@ import io.vertx.core.streams.ReadStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import lombok.AccessLevel;
@@ -25,11 +24,11 @@ import lombok.Setter;
 @Setter(AccessLevel.PRIVATE)
 public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
   private static final int DEFAULT_CHUNK_SIZE = 8192;
-  private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+  private static final int DEFAULT_SLEEP_MILLIS = 20;
 
   private final Vertx vertx;
   private final Executor executor;
-  private final PushbackInputStream in;
+  private final InputStream in;
   private final int chunkSize;
   private final long sleepBetweenReadsMillis;
 
@@ -43,7 +42,7 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
   private long totalBytesRead;
 
   public AsyncInputStream(InputStream in) {
-    this(Ctx.vertx(), Executors.newSingleThreadExecutor(), in, DEFAULT_CHUNK_SIZE, 20L);
+    this(Ctx.vertx(), Executors.newSingleThreadExecutor(), in, DEFAULT_CHUNK_SIZE, DEFAULT_SLEEP_MILLIS);
   }
 
   public AsyncInputStream(Vertx vertx, Executor executor, InputStream in, int chunkSize, long sleepBetweenReadsMillis) {
@@ -59,7 +58,7 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
     }
     this.vertx = vertx;
     this.executor = executor;
-    this.in = in instanceof PushbackInputStream ? (PushbackInputStream) in : new PushbackInputStream(in);
+    this.in = in;
     this.chunkSize = chunkSize;
     this.sleepBetweenReadsMillis = sleepBetweenReadsMillis;
   }
@@ -145,10 +144,6 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
   }
 
   private byte[] readChunk() throws Exception {
-    // TODO: 27.01.2018 audioStream does not support unreading, remove this + pushbackInputStream wrapper?
-/*    if (isEndOfInput()) {
-      return EMPTY_BYTE_ARRAY;
-    }*/
     int bytesAvailable = in.available();
     int chunkSize = bytesAvailable <= 0 ? this.chunkSize : Math.min(this.chunkSize, in.available());
     try {
@@ -163,14 +158,5 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
       IO.close(in);
       return null;
     }
-  }
-
-  private boolean isEndOfInput() throws IOException {
-    int bytesRead = in.read();
-    if (bytesRead < 0) {
-      return true;
-    }
-    in.unread(bytesRead);
-    return false;
   }
 }
