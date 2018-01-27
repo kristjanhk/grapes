@@ -17,3 +17,6 @@ gradlew.bat
 
 /.idea/compiler.xml
 /output/
+/modules/frontend/node_modules/
+/modules/frontend/yarn.lock
+/modules/frontend/main/resources/static/dist/

@@ -11,6 +11,8 @@
       <module name="core_test" target="1.8" />
       <module name="deploy_main" target="1.8" />
       <module name="deploy_test" target="1.8" />
+      <module name="frontend_main" target="1.8" />
+      <module name="frontend_test" target="1.8" />
       <module name="music_main" target="1.8" />
       <module name="music_test" target="1.8" />
     </bytecodeTargetLevel>

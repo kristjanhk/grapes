@@ -1,0 +1,34 @@
+{
+  "name": "Grapes",
+  "version": "0.0.1",
+  "description": "Grapes frontend",
+  "license": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kristjanhk/grapes.git"
+  },
+  "scripts": {
+    "prod": "webpack --config webpack.prod.js --display-error-details",
+    "dev": "webpack-dev-server --config webpack.dev.js --open --hot"
+  },
+  "dependencies": {
+    "@types/react": "^16.0.35",
+    "@types/react-dom": "^16.0.3",
+    "@types/react-fontawesome": "^1.6.1",
+    "axios": "^0.17.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-fontawesome": "^1.6.1"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.4.1",
+    "html-webpack-plugin": "^2.30.1",
+    "source-map-loader": "^0.2.3",
+    "tslint": "^5.9.1",
+    "tslint-react": "^3.4.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.11.1",
+    "webpack-merge": "^4.1.1"
+  }
+}

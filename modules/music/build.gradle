@@ -1,5 +1,6 @@
 dependencies {
     compile project(':common')
+    compile project(':frontend')
 
     compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}"
 }

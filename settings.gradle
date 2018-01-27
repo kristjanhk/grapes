@@ -8,6 +8,7 @@ include ':common'
 
 include ':music'
 include ':deploy'
+include ':frontend'
 
 
 
@@ -16,4 +17,5 @@ project(':common').projectDir = "$rootDir/modules/common" as File
 
 project(':music').projectDir = "$rootDir/modules/music" as File
 project(':deploy').projectDir = "$rootDir/modules/deploy" as File
+project(':frontend').projectDir = "$rootDir/modules/frontend" as File
 
