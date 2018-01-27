@@ -1,5 +1,6 @@
 package eu.kyngas.grapes.music;
 
+import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Eq;
 import eu.kyngas.grapes.common.util.LogUtil;
 import eu.kyngas.grapes.common.util.ParseUtil;
@@ -31,14 +32,10 @@ public class Launcher {
   }
 
   private static Handler<AsyncResult<String>> handleVerticleStarted(Vertx vertx) {
-    return ar -> {
-      if (ar.failed()) {
-        log.error("Failed to start Music Module", ar.cause());
-        vertx.close();
-        return;
-      }
-      log.info("Music module started");
-    };
+    return ar -> C.check(ar.succeeded(), () -> log.info("Music module started"), () -> {
+      log.error("Failed to start Music Module", ar.cause());
+      vertx.close();
+    });
   }
 
   private static int getMixerIndex(String[] args) {

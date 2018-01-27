@@ -35,6 +35,7 @@ subprojects {
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${cfg.ver.lombok}"
 
         compile group: 'ch.qos.logback', name: 'logback-classic', version: "${cfg.ver.logback}"
+        compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
 
         testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
     }

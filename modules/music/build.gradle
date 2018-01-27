@@ -1,7 +1,6 @@
 dependencies {
     compile project(':common')
 
-    compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
     compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}"
 }
 
