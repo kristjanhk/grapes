@@ -1,6 +1,5 @@
 package eu.kyngas.grapes.common.util;
 
-import io.vertx.core.json.JsonObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,6 +7,8 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import lombok.extern.slf4j.Slf4j;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -17,22 +18,25 @@ public class Config {
   private static final String DEFAULT_CONFIG = "/config.json";
   private static final boolean IS_RUNNING_FROM_JAR = getLocation().toString().endsWith(".jar");
 
-  /**
-   * Loads config from classpath.
-   *
-   * @return config.json config
-   */
-  public static JsonObject getConfig() {
+  public static JsonObj getConfig(String location, String[] args) {
+    return getConfig(location).mergeIn(getArgs(args));
+  }
+
+  public static JsonObj getConfig(String[] args) {
+    return getConfig(DEFAULT_CONFIG, args);
+  }
+
+  public static JsonObj getConfig() {
     return getConfig(DEFAULT_CONFIG);
   }
 
-  public static JsonObject getConfig(String location) {
+  public static JsonObj getConfig(String location) {
     try {
-      return new JsonObject(readToString(checkFormat(location)));
+      return new JsonObj(readToString(checkFormat(location)));
     } catch (IOException e) {
       log.error(location + " not found.");
     }
-    return new JsonObject();
+    return new JsonObj();
   }
 
   private static String checkFormat(String location) {
@@ -82,13 +86,35 @@ public class Config {
 
   private static Path getLocation() {
     return Paths.get(Config.class.getProtectionDomain()
-                                 .getCodeSource()
-                                 .getLocation()
-                                 .getPath()
-                                 .substring(1));
+                         .getCodeSource()
+                         .getLocation()
+                         .getPath()
+                         .substring(1));
   }
 
   public static boolean isRunningFromJar() {
     return IS_RUNNING_FROM_JAR;
+  }
+
+  /**
+   * Converts given args to JsonObject.
+   * Example input: String[]{"-key1=value1", "-key2", ...} -> {"key1": "value1", "key2": true}
+   *
+   * @param args to convert
+   * @return jsonObj
+   */
+  public static JsonObj getArgs(String[] args) {
+    if (args == null) {
+      return new JsonObj();
+    }
+    JsonObj valuesMap = new JsonObj(stream(args)
+                                        .filter(s -> s.startsWith("-"))
+                                        .map(s -> s.replaceFirst("-", "").split("="))
+                                        .collect(toMap(s -> s[0], s -> s[1])));
+    JsonObj booleanMap = new JsonObj(stream(args)
+                                         .filter(s -> s.startsWith("-") && !s.contains("="))
+                                         .map(s -> s.replaceFirst("-", ""))
+                                         .collect(toMap(s -> s, s -> true)));
+    return valuesMap.mergeIn(booleanMap);
   }
 }

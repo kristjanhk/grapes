@@ -3,6 +3,7 @@ package eu.kyngas.grapes.common.util;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,6 +24,10 @@ public class N {
       runnable.run();
     }
     return obj;
+  }
+
+  public static <T> T ifMissing(T input, Supplier<T> ifMissing) {
+    return input == null ? ifMissing.get() : input;
   }
 
   public static boolean anyNull(Object... objs) {

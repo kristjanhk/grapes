@@ -12,7 +12,7 @@ import javax.sound.sampled.TargetDataLine;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class AudioUtil {
-  public static final String MIXER_INDEX = "mixerIndex";
+  public static final String MIXER_INDEX = "mixer";
 
   public static AudioFormat getAudioFormat() {
     return new AudioFormat(44100,
