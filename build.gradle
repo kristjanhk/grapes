@@ -33,16 +33,20 @@ subprojects {
     dependencies {
         compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${cfg.ver.lombok}"
+        compileOnly group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: "${cfg.ver.vertx}"
+        compileOnly group: 'io.vertx', name: 'vertx-lang-js', version: "${cfg.ver.vertx}"
 
         compile group: 'ch.qos.logback', name: 'logback-classic', version: "${cfg.ver.logback}"
         compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
+        compile group: 'io.vertx', name: 'vertx-service-discovery', version: "${cfg.ver.vertx}"
+        compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${cfg.ver.vertx}"
 
         testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
     }
     sourceSets {
         main {
             java {
-                srcDirs = ["${cfg.dir.main.java}"]
+                srcDirs = ["${cfg.dir.main.java}", "${cfg.dir.main.gen}"]
             }
             resources {
                 srcDirs = ["${cfg.dir.main.resources}"]
@@ -72,7 +76,7 @@ subprojects {
                 '-proc:only',
                 '-processor',
                 'io.vertx.codegen.CodeGenProcessor',
-                "-Acodegen.output=${project.projectDir}${cfg.dir.main.gen}",
+                "-Acodegen.output=${project.projectDir}/${cfg.dir.main.gen}",
                 "-Acodegen.generators=${cfg.codegen.processors}"
         ]
     }
@@ -92,24 +96,3 @@ task wrapper(type: Wrapper) {
     //noinspection UnnecessaryQualifiedReference
     distributionType = Wrapper.DistributionType.ALL
 }
-
-//todo needed for excluding root module?
-/*
-sourceSets {
-    main {
-        java {
-            srcDirs = []
-        }
-        resources {
-            srcDirs = []
-        }
-    }
-    test {
-        java {
-            srcDirs = []
-        }
-        resources {
-            srcDirs = []
-        }
-    }
-}*/
