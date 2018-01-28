@@ -1,4 +1,5 @@
 const Merge = require('webpack-merge');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CommonConfig = require('./webpack.common');
 
 module.exports = new Merge(CommonConfig, {
@@ -7,6 +8,6 @@ module.exports = new Merge(CommonConfig, {
     publicPath: '/static/dist/'
   },
   plugins: [
-
+    new CleanWebpackPlugin(['./main/resources/static/dist']),
   ]
 });
