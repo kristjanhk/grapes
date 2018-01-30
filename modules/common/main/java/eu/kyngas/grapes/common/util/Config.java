@@ -1,11 +1,14 @@
 package eu.kyngas.grapes.common.util;
 
+import eu.kyngas.grapes.common.entity.JsonObj;
+import io.vertx.core.json.JsonObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
@@ -34,9 +37,20 @@ public class Config {
     try {
       return new JsonObj(readToString(checkFormat(location)));
     } catch (IOException e) {
-      log.error(location + " not found.");
+      log.error("Config {} not found.", location);
     }
     return new JsonObj();
+  }
+
+  public static JsonObj getSubConfig(JsonObject config, String... subKeys) {
+    for (String key : subKeys) {
+      if (!config.containsKey(key)) {
+        log.error("Subconfig with does not exist with keys {}.", Arrays.toString(subKeys));
+        return new JsonObj();
+      }
+      config = config.getJsonObject(key);
+    }
+    return JsonObj.from(config);
   }
 
   private static String checkFormat(String location) {

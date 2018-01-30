@@ -3,7 +3,7 @@ package eu.kyngas.grapes.music;
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
-import eu.kyngas.grapes.common.util.JsonObj;
+import eu.kyngas.grapes.common.entity.JsonObj;
 import eu.kyngas.grapes.common.util.LogUtil;
 import eu.kyngas.grapes.music.verticle.MusicClientVerticle;
 import eu.kyngas.grapes.music.verticle.MusicVerticle;

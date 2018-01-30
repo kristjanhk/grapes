@@ -3,12 +3,14 @@
   "http_host": "localhost",
   "mixer": 1,
   "spotify": {
-    "api_host": "api.spotify.com",
-    "accounts_host": "accounts.spotify.com",
+    "host": "api.spotify.com",
     "port": 443,
     "ssl": true,
-    "client_id": "",
-    "client_secret": "",
-    "redirect_uri": "/music/callback"
+    "auth": {
+      "host": "accounts.spotify.com",
+      "client_id": "",
+      "client_secret": "",
+      "redirect_uri": "/music/callback"
+    }
   }
 }

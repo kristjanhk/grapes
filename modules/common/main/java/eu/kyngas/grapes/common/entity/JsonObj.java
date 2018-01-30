@@ -1,5 +1,23 @@
-package eu.kyngas.grapes.common.util;
+/*
+ * Copyright (C) 2018 Kristjan Hendrik Küngas
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+package eu.kyngas.grapes.common.entity;
+
+import eu.kyngas.grapes.common.util.N;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -8,8 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import lombok.NoArgsConstructor;
 import static eu.kyngas.grapes.common.util.N.ifMissing;
 
 /**
@@ -18,6 +38,7 @@ import static eu.kyngas.grapes.common.util.N.ifMissing;
  *
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
+@NoArgsConstructor
 public class JsonObj extends JsonObject {
   private static final Map<Class, Function<String, Object>> PARSER_MAP = new HashMap<>();
 
@@ -39,14 +60,18 @@ public class JsonObj extends JsonObject {
     super(map);
   }
 
-  public JsonObj() {
+  public static JsonObj from(JsonObject parent) {
+    return parent == null ? null : new JsonObj(parent.getMap());
   }
 
-  public static JsonObj fromParent(Object parent) {
-    if (parent == null || !(parent instanceof JsonObject)) {
-      return null;
-    }
-    return new JsonObj(((JsonObject) parent).getMap());
+  public static JsonObj from(Object parent) {
+    return parent == null || !(parent instanceof JsonObject) ? null : new JsonObj(((JsonObject) parent).getMap());
+  }
+
+  public static JsonObj wrap(Consumer<JsonObj> consumer) {
+    JsonObj json = new JsonObj();
+    N.safe(consumer, c -> c.accept(json));
+    return json;
   }
 
   private Object get(String key) {
