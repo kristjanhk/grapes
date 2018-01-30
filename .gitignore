@@ -20,3 +20,4 @@ gradlew.bat
 /modules/frontend/node_modules/
 /modules/frontend/yarn.lock
 /modules/frontend/main/resources/static/dist/
+/modules/music/main/resources/spotify-config.json
