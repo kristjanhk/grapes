@@ -15,13 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.common.entity;
+@ModuleGen(name = "spotify", groupPackage = "eu.kyngas.grapes.music.spotify")
+package eu.kyngas.grapes.music.spotify;
 
-import io.vertx.core.json.JsonObject;
-
-/**
- * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
- */
-public interface Action {
-  JsonObject toJson();
-}
+import io.vertx.codegen.annotations.ModuleGen;

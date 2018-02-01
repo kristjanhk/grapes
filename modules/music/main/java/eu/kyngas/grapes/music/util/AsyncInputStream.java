@@ -4,7 +4,7 @@ import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.IO;
 import eu.kyngas.grapes.common.util.N;
-import eu.kyngas.grapes.common.util.ThreadUtil;
+import eu.kyngas.grapes.common.util.Threads;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -133,7 +133,7 @@ public class AsyncInputStream implements ReadStream<Buffer>, Closeable {
             readHandler.handle(Buffer.buffer(buffer));
             doRead();
           });
-          C.ifTrue(sleepBetweenReadsMillis > 0, () -> ThreadUtil.sleep(sleepBetweenReadsMillis));
+          C.ifTrue(sleepBetweenReadsMillis > 0, () -> Threads.sleep(sleepBetweenReadsMillis));
         });
       } catch (Exception e) {
         setStatus(Status.CLOSED);

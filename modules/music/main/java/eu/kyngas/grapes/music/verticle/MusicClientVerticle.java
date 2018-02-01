@@ -7,10 +7,7 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import javax.sound.sampled.SourceDataLine;
 import lombok.extern.slf4j.Slf4j;
-import static eu.kyngas.grapes.common.util.Network.DEFAULT_HTTP_HOST;
-import static eu.kyngas.grapes.common.util.Network.HTTP_HOST;
-import static eu.kyngas.grapes.common.util.Network.HTTP_PORT;
-import static eu.kyngas.grapes.common.util.Network.HTTP_SSL;
+import static eu.kyngas.grapes.common.util.Networks.*;
 import static eu.kyngas.grapes.music.Launcher.DEFAULT_HTTP_PORT;
 import static eu.kyngas.grapes.music.util.AudioUtil.MIXER_INDEX;
 
@@ -31,7 +28,7 @@ public class MusicClientVerticle extends AbstractVerticle {
                                         .setTrustAll(true)
                                         .setSsl(config().getBoolean(HTTP_SSL, DEFAULT_HTTP_SSL))
                                         .setDefaultPort(config().getInteger(HTTP_PORT, DEFAULT_HTTP_PORT))
-                                        .setDefaultHost(config().getString(HTTP_HOST, DEFAULT_HTTP_HOST)));
+                                        .setDefaultHost(config().getString(HTTP_HOST, DEFAULT_HOST)));
     connect(sourceDataLine);
   }
 

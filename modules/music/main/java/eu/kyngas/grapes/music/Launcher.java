@@ -4,7 +4,7 @@ import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.entity.JsonObj;
-import eu.kyngas.grapes.common.util.LogUtil;
+import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.music.verticle.MusicClientVerticle;
 import eu.kyngas.grapes.music.verticle.MusicVerticle;
 import io.vertx.core.AsyncResult;
@@ -22,11 +22,13 @@ public class Launcher {
   public static final int DEFAULT_HTTP_PORT = 8085;
 
   public static void main(String[] args) {
-    LogUtil.setLoggingToSLF4J();
+    Logs.setLoggingToSLF4J();
     JsonObject arguments = Config.getArgs(args);
     boolean runningAsServer = !arguments.containsKey("client") || !arguments.getBoolean("client", false);
 
-    JsonObj config = runningAsServer ? Config.getConfig() : Config.getConfig("client-config");
+    JsonObj config = runningAsServer
+        ? Config.getGlobal().mergeIn(Config.getConfig("music"))
+        : Config.getConfig("client-config");
     Ctx.createVertx(vertx -> vertx.deployVerticle(runningAsServer ? new MusicVerticle() : new MusicClientVerticle(),
                                                   new DeploymentOptions().setConfig(config.mergeIn(arguments)),
                                                   handleVerticleStarted(vertx)));

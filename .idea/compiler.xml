@@ -17,4 +17,7 @@
       <module name="music_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="DEPRECATION" value="false" />
+  </component>
 </project>

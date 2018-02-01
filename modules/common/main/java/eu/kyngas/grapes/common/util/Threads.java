@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 @Slf4j
-public class ThreadUtil {
+public class Threads {
 
   public static void sleep(long millis) {
     try {

@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 public class Config {
-  private static final String DEFAULT_CONFIG = "/config.json";
+  private static final String DEFAULT_CONFIG = "/global.json";
   private static final boolean IS_RUNNING_FROM_JAR = getLocation().toString().endsWith(".jar");
 
   public static JsonObj getConfig(String location, String[] args) {
@@ -29,7 +29,7 @@ public class Config {
     return getConfig(DEFAULT_CONFIG, args);
   }
 
-  public static JsonObj getConfig() {
+  public static JsonObj getGlobal() {
     return getConfig(DEFAULT_CONFIG);
   }
 

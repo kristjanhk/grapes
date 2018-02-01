@@ -15,13 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.common.entity;
+package eu.kyngas.grapes.common.router;
 
-import io.vertx.core.json.JsonObject;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface Action {
-  JsonObject toJson();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class Header {
+  public static final String LOCATION = "Location";
 }

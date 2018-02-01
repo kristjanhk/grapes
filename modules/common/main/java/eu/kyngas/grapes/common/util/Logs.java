@@ -3,7 +3,7 @@ package eu.kyngas.grapes.common.util;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class LogUtil {
+public class Logs {
 
   /**
    * Changes vertx logging to SLF4J.

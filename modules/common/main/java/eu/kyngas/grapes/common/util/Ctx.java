@@ -5,6 +5,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import java.util.function.Consumer;
 
 /**
@@ -22,6 +23,14 @@ public class Ctx {
 
   public static Vertx vertx() {
     return ctx().owner();
+  }
+
+  public static JsonObject config() {
+    return Ctx.ctx().config();
+  }
+
+  public static JsonObject subConfig(String... subKeys) {
+    return Config.getSubConfig(config(), subKeys);
   }
 
   public static void createVertx(Consumer<Vertx> consumer) {

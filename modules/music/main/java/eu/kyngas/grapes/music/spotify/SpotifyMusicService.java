@@ -15,13 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.common.entity;
+package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.util.Ctx;
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface Action {
-  JsonObject toJson();
+@VertxGen
+@ProxyGen
+public interface SpotifyMusicService extends SpotifyService {
+  String ADDRESS = "music.spotify.music";
+
+  static SpotifyMusicService create() {
+    return new SpotifyMusicServiceImpl(Ctx.subConfig(SPOTIFY));
+  }
+
+  static SpotifyMusicService createProxy() {
+    return new SpotifyMusicServiceVertxEBProxy(Ctx.vertx(), ADDRESS);
+  }
+
+  @Fluent
+  SpotifyMusicService getTestData(Handler<AsyncResult<JsonObject>> handler);
 }
