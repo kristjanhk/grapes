@@ -1,6 +1,7 @@
 package eu.kyngas.grapes.music.verticle;
 
 import eu.kyngas.grapes.common.util.C;
+import eu.kyngas.grapes.music.router.MainRouter;
 import eu.kyngas.grapes.music.util.AsyncInputStream;
 import eu.kyngas.grapes.music.util.AudioUtil;
 import io.vertx.core.AbstractVerticle;
@@ -22,9 +23,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import lombok.extern.slf4j.Slf4j;
 import static eu.kyngas.grapes.common.util.Config.isRunningFromJar;
-import static eu.kyngas.grapes.common.util.Network.DEFAULT_HTTP_HOST;
-import static eu.kyngas.grapes.common.util.Network.HTTP_HOST;
-import static eu.kyngas.grapes.common.util.Network.HTTP_PORT;
+import static eu.kyngas.grapes.common.util.Networks.*;
 import static eu.kyngas.grapes.music.Launcher.DEFAULT_HTTP_PORT;
 import static eu.kyngas.grapes.music.util.AudioUtil.MIXER_INDEX;
 
@@ -48,7 +47,8 @@ public class MusicVerticle extends AbstractVerticle {
   @Override
   public void start(Future<Void> future) {
     mixerIndex = config().getInteger(MIXER_INDEX);
-    Router router = Router.router(vertx);
+
+    Router router = MainRouter.create();
 
     String staticFilesPath = isRunningFromJar() ? STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString();
     router.get(STATIC_PATH).handler(StaticHandler.create(staticFilesPath)
@@ -60,7 +60,7 @@ public class MusicVerticle extends AbstractVerticle {
     server = vertx.createHttpServer()
                   .requestHandler(router::accept)
                   .listen(config().getInteger(HTTP_PORT, DEFAULT_HTTP_PORT),
-                          config().getString(HTTP_HOST, DEFAULT_HTTP_HOST),
+                          config().getString(HTTP_HOST, DEFAULT_HOST),
                           handleServerStarted(future));
   }
 

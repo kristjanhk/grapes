@@ -21,3 +21,4 @@ gradlew.bat
 /modules/frontend/yarn.lock
 /modules/frontend/main/resources/static/dist/
 /modules/music/main/resources/spotify-secret.json
+/.idea/dictionaries/Kristjan.xml
