@@ -1,7 +1,6 @@
 {
   "http_port": 8080,
   "http_host": "localhost",
-  "mixer": 1,
   "spotify": {
     "host": "api.spotify.com",
     "port": 443,
@@ -12,5 +11,10 @@
       "client_secret": "",
       "redirect_uri": "/music/callback"
     }
+  },
+  "radio": {
+    "mixer": 1,
+    "quality": 5,
+    "bitrate": 192
   }
 }

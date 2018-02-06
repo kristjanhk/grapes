@@ -1,6 +1,0 @@
-{
-  "http_port": 443,
-  "http_host": "kyngas.eu",
-  "http_ssl": true,
-  "mixer": 0
-}
