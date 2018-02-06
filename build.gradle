@@ -98,10 +98,20 @@ subprojects {
     delete "${cfg.dir.main.gen}"
   }
   clean.dependsOn proxyClean
+
+  applicationDefaultJvmArgs = getDebugOptions()
 }
 
 task wrapper(type: Wrapper) {
   gradleVersion = "${cfg.ver.gradle}"
   //noinspection UnnecessaryQualifiedReference
   distributionType = Wrapper.DistributionType.ALL
+}
+
+static List<String> getDebugOptions() {
+  String debugger = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+  String eventLoopChecker = "-Dvertx.options.maxEventLoopExecuteTime=${Long.MAX_VALUE}"
+  String workerChecker = "-Dvertx.options.maxWorkerExecuteTime=${Long.MAX_VALUE}"
+  String mark = '-Dvertx.debug=true'
+  return [debugger, eventLoopChecker, workerChecker, mark]
 }
