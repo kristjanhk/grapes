@@ -8,6 +8,6 @@ module.exports = new Merge(CommonConfig, {
     publicPath: '/static/dist/'
   },
   plugins: [
-    new CleanWebpackPlugin(['./main/resources/static/dist']),
+    //new CleanWebpackPlugin(['./main/resources/static/dist']),
   ]
 });
