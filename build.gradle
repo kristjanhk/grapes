@@ -92,7 +92,6 @@ subprojects {
   compileJava {
     options.encoding = 'UTF-8'
     dependsOn proxyGen
-    //todo dependsOn webpack compilation (npm run prod)
   }
 
   task proxyClean(type: Delete) {
