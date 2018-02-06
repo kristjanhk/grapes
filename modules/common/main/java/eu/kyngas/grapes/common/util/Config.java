@@ -124,6 +124,7 @@ public class Config {
     JsonObj valuesMap = new JsonObj(stream(args)
                                         .filter(s -> s.startsWith("-"))
                                         .map(s -> s.replaceFirst("-", "").split("="))
+                                        .filter(array -> array.length == 2)
                                         .collect(toMap(s -> s[0], s -> s[1])));
     JsonObj booleanMap = new JsonObj(stream(args)
                                          .filter(s -> s.startsWith("-") && !s.contains("="))
