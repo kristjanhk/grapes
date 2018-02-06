@@ -15,33 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.router;
+package eu.kyngas.grapes.music.radio;
 
 import eu.kyngas.grapes.common.util.Ctx;
-import eu.kyngas.grapes.music.spotify.SpotifyRouter;
-import eu.kyngas.grapes.music.radio.RadioRouter;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.impl.RouterImpl;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class MainRouter extends RouterImpl {
-  private final RestRouter spotifyRouter = new SpotifyRouter();
-  private final RadioRouter radioRouter = new RadioRouter();
+public interface RadioService {
 
-  private MainRouter() {
-    super(Ctx.vertx());
+  static RadioService create() {
+    return new RadioServiceImpl(Ctx.subConfig("radio"));
   }
 
-  public static Router create() {
-    return new MainRouter().initRoutes();
-  }
-
-  public Router initRoutes() {
-    // TODO: 1.02.2018 impl common routes -> static handler etc.
-    spotifyRouter.subRouterTo(this, "/spotify");
-    radioRouter.subRouterTo(this, "/radio");
-    return this;
-  }
+  void addClient(RoutingContext ctx);
 }

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/howler@2.0.8/dist/howler.min.js"></script>
+</head>
+<body>
+Should start playing music
+<script type="text/javascript">
+  var howler = new Howl({
+    src: 'https://kyngas.eu/radio/stream',
+    html5: true,
+    format: ['mp3']
+  });
+  howler.play();
+</script>
+</body>
+</html>
