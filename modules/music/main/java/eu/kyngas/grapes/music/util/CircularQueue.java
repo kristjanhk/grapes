@@ -5,12 +5,10 @@ import eu.kyngas.grapes.common.util.N;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@Slf4j
 public class CircularQueue<T> {
   private final AtomicInteger currentSize = new AtomicInteger();
   private final ConcurrentLinkedQueue<T> queue = new ConcurrentLinkedQueue<>();

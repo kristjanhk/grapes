@@ -19,6 +19,7 @@ package eu.kyngas.grapes.music.router;
 
 import eu.kyngas.grapes.common.router.Status;
 import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.util.Strings;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -28,12 +29,10 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.RouterImpl;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@Slf4j
 public abstract class RestRouter extends RouterImpl {
 
   public RestRouter() {
@@ -43,8 +42,8 @@ public abstract class RestRouter extends RouterImpl {
   public void subRouterTo(Router parent, String path) {
     parent.mountSubRouter(path, this);
     addRoutes();
-    log.debug("{} registered routes under {}: {}",
-              getClass().getSimpleName(), path, Strings.join(getRoutes(), Route::getPath));
+    Logs.debug("{} registered routes under {}: {}",
+               getClass().getSimpleName(), path, Strings.join(getRoutes(), Route::getPath));
   }
 
   protected abstract void addRoutes();
@@ -52,16 +51,16 @@ public abstract class RestRouter extends RouterImpl {
   protected <T> Handler<AsyncResult<T>> handler(RoutingContext ctx, Consumer<T> consumer) {
     return ar -> {
       if (ar.failed()) {
-        log.error("RestRouter handler failure", ar.cause());
+        Logs.error("RestRouter handler failure", ar.cause());
         Status.internalError(ctx, ar.cause());
         return;
       }
       if (consumer == null) {
-        log.error("RestRouter passed null handler");
+        Logs.error("RestRouter passed null handler");
         Status.notFound(ctx);
         return;
       }
-      log.info("User: {}, path: {}, data: {}", "dummy", ctx.request().path(), ar.result());
+      Logs.info("User: {}, path: {}, data: {}", "dummy", ctx.request().path(), ar.result());
       consumer.accept(ar.result());
     };
   }

@@ -35,14 +35,12 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import lombok.extern.slf4j.Slf4j;
 import static eu.kyngas.grapes.common.util.Config.isRunningFromJar;
 import static eu.kyngas.grapes.common.util.Networks.*;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@Slf4j
 public class MusicVerticle extends Verticle {
   private static final Path RESOURCES = Paths.get("modules/music/main/resources");
   private static final String STATIC_PATH = "/static/*";
@@ -77,11 +75,11 @@ public class MusicVerticle extends Verticle {
   private Handler<AsyncResult<HttpServer>> handleServerStarted(Future<Void> future) {
     return ar -> {
       if (ar.failed()) {
-        log.error("Failed to start http server", ar.cause());
+        Logs.error("Failed to start http server", ar.cause());
         future.fail(ar.cause());
         return;
       }
-      log.info("Http server started");
+      Logs.info("Http server started");
       future.complete();
     };
   }
@@ -89,14 +87,14 @@ public class MusicVerticle extends Verticle {
   @Override
   public void stop(Future<Void> fut) {
     server.close(ar -> C.check(ar.succeeded(), fut::complete, () -> {
-      log.error("Failed to properly close http server", ar.cause());
+      Logs.error("Failed to properly close http server", ar.cause());
       fut.fail(ar.cause());
     }));
   }
 
   private static Handler<AsyncResult<String>> handleVerticleStarted(Vertx vertx) {
-    return ar -> C.check(ar.succeeded(), () -> log.info("Music module started"), () -> {
-      log.error("Failed to start Music Module", ar.cause());
+    return ar -> C.check(ar.succeeded(), () -> Logs.info("Music module started"), () -> {
+      Logs.error("Failed to start Music Module", ar.cause());
       vertx.close();
     });
   }
