@@ -100,6 +100,26 @@ subprojects {
   clean.dependsOn proxyClean
 
   applicationDefaultJvmArgs = getDebugOptions()
+
+  task deploy(dependsOn: shadowJar) {
+    doLast {
+      ssh.run {
+        session(remotes.kyngas) {
+          put from: "${shadowJar.destinationDir}/${getBundleName(shadowJar)}", into: getServerOutputDir(remotes)
+        }
+      }
+    }
+  }
+
+  task runRemote(dependsOn: deploy) {
+    doLast {
+      ssh.run {
+        session(remotes.kyngas) {
+          execute "java -jar ${getServerOutputDir(remotes)}${getBundleName(shadowJar)}", pty: true
+        }
+      }
+    }
+  }
 }
 
 task wrapper(type: Wrapper) {
@@ -114,4 +134,24 @@ static List<String> getDebugOptions() {
   String workerChecker = "-Dvertx.options.maxWorkerExecuteTime=${Long.MAX_VALUE}"
   String mark = '-Dvertx.debug=true'
   return [debugger, eventLoopChecker, workerChecker, mark]
+}
+
+static String getBundleName(shadow) {
+  return "${shadow.baseName}-${shadow.classifier}.jar"
+}
+
+static String getServerOutputDir(remotes) {
+  return "/home/${remotes.kyngas.user}/Downloads/"
+}
+
+remotes {
+  kyngas {
+    host = 'kyngas.eu'
+    user = 'kristjan'
+    identity = file('/misc/id_rsa')
+  }
+}
+
+ssh.settings {
+  knownHosts = file('/misc/known_hosts')
 }
