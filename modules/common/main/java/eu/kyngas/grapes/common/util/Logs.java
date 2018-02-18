@@ -41,18 +41,33 @@ public class Logs {
   }
 
   public static void info(String msg, Object... params) {
-    LOGGER.callAppenders(createLoggingEvent(Level.INFO, msg, params));
+    LOGGER.callAppenders(createLoggingEvent(Level.INFO, 1, msg, params));
+  }
+
+  public static void info(int skip, String msg, Object... params) {
+    LOGGER.callAppenders(createLoggingEvent(Level.INFO, skip, msg, params));
   }
 
   public static void debug(String msg, Object... params) {
-    LOGGER.callAppenders(createLoggingEvent(Level.DEBUG, msg, params));
+    LOGGER.callAppenders(createLoggingEvent(Level.DEBUG, 1, msg, params));
+  }
+
+  public static void debug(int skip, String msg, Object... params) {
+    LOGGER.callAppenders(createLoggingEvent(Level.DEBUG, skip, msg, params));
   }
 
   public static void error(String msg, Object... params) {
-    LOGGER.callAppenders(createLoggingEvent(Level.ERROR, msg, params));
+    LOGGER.callAppenders(createLoggingEvent(Level.ERROR, 1, msg, params));
   }
 
-  private static LoggingEvent createLoggingEvent(Level level, String msg, Object... params) {
+  public static void error(int skip, String msg, Object... params) {
+    LOGGER.callAppenders(createLoggingEvent(Level.ERROR, skip, msg, params));
+  }
+
+  private static LoggingEvent createLoggingEvent(Level level, int skip, String msg, Object... params) {
+    if (skip < 0) {
+      skip = 1;
+    }
     FormattingTuple tuple = MessageFormatter.arrayFormat(msg, params);
     boolean hasEx = tuple.getThrowable() != null;
 
@@ -64,7 +79,7 @@ public class Logs {
 
     Throwable throwable = hasEx ? tuple.getThrowable() : new Throwable("Unknown cause");
     throwable.setStackTrace(Arrays.stream(throwable.getStackTrace())
-                                .skip(hasEx ? 0 : 2)
+                                .skip(hasEx ? 0 : skip + 1)
                                 .limit(8)
                                 .toArray(StackTraceElement[]::new));
     LoggingEvent loggingEvent = new LoggingEvent(Logger.FQCN,

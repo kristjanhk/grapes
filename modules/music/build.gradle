@@ -4,6 +4,7 @@ dependencies {
 
   compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}"
   compile files("lib/net.sourceforge.lame-3.98.4.jar")
+  compile group: 'com.github.hypfvieh', name: 'dbus-java', version: '2.7.4'
 }
 
 mainClassName = 'eu.kyngas.grapes.music.MusicVerticle'

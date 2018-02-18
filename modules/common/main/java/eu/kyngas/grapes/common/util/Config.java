@@ -6,9 +6,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
@@ -96,6 +100,15 @@ public class Config {
     }
     inputStream.close();
     return result.toString("UTF-8");
+  }
+
+  public static List<String> readFile(String absolutePath) {
+    try {
+      return Files.readAllLines(Paths.get(absolutePath), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      Logs.error("Failed to read file {}", absolutePath, e);
+    }
+    return Collections.emptyList();
   }
 
   private static Path getLocation() {

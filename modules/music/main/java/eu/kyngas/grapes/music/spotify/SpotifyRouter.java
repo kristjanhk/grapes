@@ -17,8 +17,8 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.router.Status;
 import eu.kyngas.grapes.music.router.RestRouter;
-import io.vertx.ext.web.RoutingContext;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -26,15 +26,20 @@ import io.vertx.ext.web.RoutingContext;
 public class SpotifyRouter extends RestRouter {
   private final SpotifyAuthService spotifyAuthService = SpotifyAuthService.create();
   private final SpotifyMusicService spotifyMusicService = SpotifyMusicService.create();
+  private final SpotifyLocalService spotifyLocalService = SpotifyLocalService.create();
 
   @Override
   public void addRoutes() {
     get("/authorize").handler(ctx -> spotifyAuthService.doAuthorize(handler(ctx, action -> action.redirect(ctx))));
-    get("/callback").handler(this::handleCallback);
-    get("/test").handler(ctx -> spotifyMusicService.getTestData(jsonResponse(ctx)));
-  }
-
-  private void handleCallback(RoutingContext ctx) {
-
+    get("/callback").handler(ctx -> spotifyAuthService.doCallback(ctx, jsonResponse(ctx)));
+    get("/toggle").handler(ctx -> spotifyLocalService.togglePlayback(handler(ctx, v -> Status.ok(ctx))));
+    get("/openuri").handler(ctx -> {
+      String uri = ctx.request().getParam("uri");
+      if (uri == null) {
+        Status.badRequest(ctx, new Throwable("Missing uri parameter"));
+        return;
+      }
+      spotifyLocalService.playTrack(uri, handler(ctx, v -> Status.ok(ctx)));
+    });
   }
 }
