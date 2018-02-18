@@ -15,26 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.common.util;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import java.util.function.Consumer;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public class H {
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig("spotify-secret")));
+  public static Handler<Buffer> toLogJson(Consumer<JsonObject> consumer) {
+    return buffer -> {
+      JsonObject json = buffer.toJsonObject();
+      Logs.info("Response json: {}", json);
+      N.safe(consumer, c -> c.accept(json));
+    };
   }
 
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
+  public static Handler<HttpClientResponse> logResponse(Consumer<HttpClientResponse> consumer) {
+    return response -> N.safe(consumer, c -> {
 
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
+    });
+  }
 }

@@ -19,18 +19,29 @@ package eu.kyngas.grapes.music.spotify;
 
 import eu.kyngas.grapes.common.entity.Pair;
 import eu.kyngas.grapes.common.router.RedirectAction;
+import eu.kyngas.grapes.common.router.Status;
 import eu.kyngas.grapes.common.service.HttpService;
 import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.common.util.F;
+import eu.kyngas.grapes.common.util.H;
 import eu.kyngas.grapes.common.util.Http;
+import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.util.Networks;
+import eu.kyngas.grapes.common.util.Strings;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +55,11 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
   private static final String CLIENT_ID = "client_id";
   private static final String CLIENT_SECRET = "client_secret";
   private static final String REDIRECT_URI = "redirect_uri";
+  private static final String CODE = "code";
+  private static final String STATE = "state";
+  private static final String ERROR = "error";
+  private static final String GRANT_TYPE = "grant_type";
+  private static final String REFRESH_TOKEN = "refresh_token";
 
   private final Vertx vertx = Ctx.vertx();
   private final String clientId;
@@ -52,9 +68,10 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
   private final HttpClientOptions options;
   private final HttpClient client;
 
-  private Set<String> knownUuids = new HashSet<>();
+  private Set<String> csrfTokens = new HashSet<>();
+  private Map<String, Token> tokens = new HashMap<>();
 
-  public SpotifyAuthServiceImpl(JsonObject config) {
+  SpotifyAuthServiceImpl(JsonObject config) {
     this.clientId = config.getString(CLIENT_ID, "");
     this.clientSecret = config.getString(CLIENT_SECRET, "");
     this.redirectUri = config.getString(REDIRECT_URI, "");
@@ -79,20 +96,83 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
       return this;
     }
     String uuid = UUID.randomUUID().toString();
-    knownUuids.add(uuid);
-    String redirectUri = Networks.getInstance().getProductionHost() + this.redirectUri;
+    csrfTokens.add(uuid);
     handler.handle(Future.succeededFuture(Http.Query.of("/authorize")
                                               .param(CLIENT_ID, clientId)
-                                              .param("response_type", "code")
-                                              .param(REDIRECT_URI, redirectUri)
-                                              .param("state", uuid)
+                                              .param("response_type", CODE)
+                                              .param(REDIRECT_URI, getRedirectUri())
+                                              .param(STATE, uuid)
                                               .toRedirectAction(options)));
-    vertx.setTimer(TimeUnit.MINUTES.toMillis(5), t -> knownUuids.remove(uuid));
+    vertx.setTimer(TimeUnit.MINUTES.toMillis(2), t -> csrfTokens.remove(uuid));
     return this;
   }
 
-  public SpotifyAuthService doAuthorizeCallback() {
+  //todo pass queryparams instead or smth
+  @Override
+  public SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler) {
+    if (!csrfTokens.remove(ctx.queryParams().get(STATE))) {
+      handler.handle(Future.failedFuture("CSRF token expired."));
+      return this;
+    }
+    String error = ctx.queryParams().get(ERROR);
+    if (error != null) {
+      handler.handle(Future.failedFuture("Spotify auth callback ex: " + error));
+      return this;
+    }
+    return requestToken(ctx.queryParams().get(CODE), handler);
+  }
 
+  private SpotifyAuthService requestToken(String code, Handler<AsyncResult<JsonObject>> handler) {
+    String uri = Http.Query.of("/api/token")
+        .param(GRANT_TYPE, "authorization_code")
+        .param(CODE, code)
+        .param(REDIRECT_URI, getRedirectUri())
+        .create();
+    HttpClientRequest request = client.post(uri, res -> handleRequestToken(res, handler))
+        .putHeader(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
+        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaders.APPLICATION_X_WWW_FORM_URLENCODED);
+    Http.logAndEndRequest(request);
     return this;
+  }
+
+  private void handleRequestToken(HttpClientResponse res, Handler<AsyncResult<JsonObject>> handler) {
+    if (res.statusCode() != Status.OK) {
+      handler.handle(F.fail("Spotify token request failed: status %s, message %s",
+                            res.statusCode(),
+                            res.statusMessage()));
+      return;
+    }
+    res.bodyHandler(H.toLogJson(json -> tokens.put("dummy", new Token(json))));
+    //todo replace dummy with actual user
+  }
+
+  private String getRedirectUri() {
+    return Networks.getInstance().getProductionHost() + redirectUri;
+  }
+
+  private String getAuthorizationHeader() {
+    return Strings.base64("%s:%s", clientId, clientSecret);
+  }
+
+  private SpotifyAuthService requestRefreshToken() {
+    String uri = Http.Query.of("/api/token")
+        .param(GRANT_TYPE, REFRESH_TOKEN)
+        .param(REFRESH_TOKEN, tokens.get("dummy").getRefreshToken())
+        .create();
+    HttpClientRequest request = client.post(uri, this::handleRequestRefreshToken)
+        .putHeader(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
+        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaders.APPLICATION_X_WWW_FORM_URLENCODED);
+    Http.logAndEndRequest(request);
+    return this;
+  }
+
+  private void handleRequestRefreshToken(HttpClientResponse res) {
+    if (res.statusCode() != Status.OK) {
+      Logs.error("Spotify token refresh request failed: status {}, message {}", res.statusCode(), res.statusMessage());
+      return;
+    }
+    res.bodyHandler(H.toLogJson(json -> tokens
+        .compute("dummy", (key, previousToken) -> new Token(json)
+            .setRefreshToken(previousToken.getRefreshToken()))));
   }
 }

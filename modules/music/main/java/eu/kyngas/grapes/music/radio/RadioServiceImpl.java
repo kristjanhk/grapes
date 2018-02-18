@@ -23,6 +23,7 @@ import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.util.Streams;
 import eu.kyngas.grapes.music.util.AsyncInputStream;
 import eu.kyngas.grapes.music.util.AudioUtil;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -52,7 +53,8 @@ public class RadioServiceImpl implements RadioService {
 
   @Override
   public void addClient(RoutingContext ctx) {
-    HttpServerResponse response = ctx.response().setChunked(true);
+    HttpServerResponse response =
+        ctx.response().setChunked(true).putHeader(HttpHeaders.CONTENT_TYPE, "audio/mpeg");
     String clientId = UUID.randomUUID().toString(); //todo get user id from ctx
     response.closeHandler(v -> handleClientDisconnect(clientId));
 

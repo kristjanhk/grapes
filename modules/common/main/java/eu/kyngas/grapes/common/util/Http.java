@@ -2,6 +2,7 @@ package eu.kyngas.grapes.common.util;
 
 import eu.kyngas.grapes.common.router.RedirectAction;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,5 +47,10 @@ public class Http {
     public RedirectAction toRedirectAction(HttpClientOptions options) {
       return new RedirectAction(toFullUrl(options.getDefaultPort(), options.getDefaultHost()));
     }
-  } 
+  }
+
+  public static void logAndEndRequest(HttpClientRequest request) {
+    Logs.info("Request: {}", request);
+    request.end();
+  }
 }

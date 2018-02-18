@@ -9,7 +9,7 @@
       "host": "accounts.spotify.com",
       "client_id": "",
       "client_secret": "",
-      "redirect_uri": "/music/callback"
+      "redirect_uri": "/spotify/callback"
     }
   },
   "radio": {

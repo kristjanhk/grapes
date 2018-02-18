@@ -18,6 +18,7 @@
 package eu.kyngas.grapes.common.entity;
 
 import eu.kyngas.grapes.common.util.N;
+import eu.kyngas.grapes.common.util.Strings;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -29,6 +30,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import static eu.kyngas.grapes.common.util.N.ifMissing;
 
@@ -66,6 +68,16 @@ public class JsonObj extends JsonObject {
 
   public static JsonObj from(Object parent) {
     return parent == null || !(parent instanceof JsonObject) ? null : new JsonObj(((JsonObject) parent).getMap());
+  }
+
+  public static JsonObj toCamelCase(JsonObject json) {
+    return new JsonObj(json.getMap().entrySet().stream()
+                           .collect(Collectors.toMap(e -> Strings.toCamelCase(e.getKey()), Map.Entry::getValue)));
+  }
+
+  public static JsonObj toSnakeCase(JsonObject json) {
+    return new JsonObj(json.getMap().entrySet().stream()
+                           .collect(Collectors.toMap(e -> Strings.toSnakeCase(e.getKey()), Map.Entry::getValue)));
   }
 
   public static JsonObj wrap(Consumer<JsonObj> consumer) {

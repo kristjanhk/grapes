@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Networks {
   public static final String DEFAULT_HOST = "localhost";
-  public static final int DEFAULT_PORT = 80;
+  public static final int DEFAULT_PORT = 8080;
   public static final String HTTP_PORT = "http_port";
   public static final String HTTP_HOST = "http_host";
   public static final String HTTP_SSL = "http_ssl";
@@ -83,6 +83,6 @@ public class Networks {
   }
 
   private String toFullUrl(String host, int port) {
-    return String.format("http%s://%s", port == 443 ? "s" : "", host);
+    return String.format("http%s://%s%s", port == 443 ? "s" : "", host, port == DEFAULT_PORT ? ":" + DEFAULT_PORT : "");
   }
 }

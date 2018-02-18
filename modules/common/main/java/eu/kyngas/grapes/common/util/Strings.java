@@ -17,7 +17,11 @@
 
 package eu.kyngas.grapes.common.util;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,5 +53,30 @@ public class Strings {
 
   private static <T> Stream<String> mapToStrings(Collection<T> items) {
     return Streams.safe(items).map(Object::toString);
+  }
+
+  public static String toCamelCase(String snakeCased) {
+    String[] parts = snakeCased.split("_");
+    if (parts.length == 1) {
+      return snakeCased;
+    }
+    String result = Arrays.stream(parts)
+        .filter(s -> s.length() > 0)
+        .map(String::toLowerCase)
+        .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
+        .collect(Collectors.joining());
+    return result.substring(0, 1).toLowerCase() + result.substring(1);
+  }
+
+  public static String toSnakeCase(String camelCased) {
+    return camelCased.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase(Locale.ENGLISH);
+  }
+
+  public static String base64(String input) {
+    return Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
+  }
+
+  public static String base64(String format, Object... params) {
+    return base64(String.format(format, params));
   }
 }
