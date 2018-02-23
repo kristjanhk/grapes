@@ -15,18 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package frontend;
-
-import io.vertx.core.AbstractVerticle;
-import lombok.extern.slf4j.Slf4j;
-
-/**
- * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
- */
-@Slf4j
-public class FrontendVerticle extends AbstractVerticle {
-
-  public static void main(String[] args) {
-    log.info("Hello world");
-  }
+plugins {
+  id "com.moowork.node" version "1.2.0"
 }
+
+task productionBundle(type: YarnTask) {
+  inputs.files(fileTree('../node_modules'))
+  inputs.files(file('../package.json'))
+  inputs.files(file('../webpack.common.js'))
+  inputs.files(file('../webpack.prod.js'))
+
+  inputs.files(fileTree('../common/ui'))
+  inputs.files(fileTree('../music/ui'))
+
+  outputs.dir('main/resources/static/dist')
+
+  dependsOn yarn_install
+  args = ['run', 'prod']
+}
+
+mainClassName = 'eu.kyngas.grapes.gateway.GatewayVerticle'
+
+shadowJar {
+  classifier = 'gateway'
+}
+
+jar.dependsOn productionBundle

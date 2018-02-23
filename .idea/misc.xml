@@ -7,6 +7,6 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="WebPackConfiguration">
-    <option name="path" value="$PROJECT_DIR$/modules/frontend/webpack.common.js" />
+    <option name="path" value="$PROJECT_DIR$/modules/webpack.common.js" />
   </component>
 </project>

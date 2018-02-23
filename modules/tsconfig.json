@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./main/resources/static/dist/",
+    "outDir": "./gateway/main/resources/static/dist/",
     "sourceMap": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "module": "commonjs",
     "target": "es5",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "moduleResolution": "node"
+    "baseUrl": ".",
+    "paths": {
+      "music/*": ["music/ui/*", "music/main/gen/*"]
+    }
   }
 }

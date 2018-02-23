@@ -1,6 +1,6 @@
 dependencies {
   compile project(':common')
-  compile project(':frontend')
+  compile project(':gateway')
 
   compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}"
   compile files("lib/net.sourceforge.lame-3.98.4.jar")

@@ -17,11 +17,11 @@ gradlew.bat
 
 /.idea/compiler.xml
 /output/
-/modules/frontend/node_modules/
-/modules/frontend/yarn.lock
-/modules/frontend/main/resources/static/dist/
+/modules/gateway/main/resources/static/dist/
 /modules/music/main/resources/spotify-secret.json
 /.idea/dictionaries/Kristjan.xml
 /modules/music/main/java/eu/kyngas/grapes/music/Todo.java
 /misc/known_hosts
 /misc/id_rsa
+/modules/node_modules/
+/modules/yarn.lock
