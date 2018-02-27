@@ -2,7 +2,7 @@
   "name": "Grapes",
   "version": "0.0.1",
   "description": "Grapes frontend",
-  "license": "AGPL-3.0-only",
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kristjanhk/grapes.git"

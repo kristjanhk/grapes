@@ -10,7 +10,10 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "music/*": ["music/ui/*", "music/main/gen/*"]
+      "music/gen/*": ["music/main/gen/*"],
+      "mikrotik/gen/*": ["mikrotik/main/gen/*"],
+      "music/*": ["music/ui/*"],
+      "mikrotik/*": ["mikrotik/ui/*"]
     }
   }
 }

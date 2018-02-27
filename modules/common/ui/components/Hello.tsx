@@ -1,5 +1,5 @@
 import {Howl} from "howler";
-import {SpotifyLocalService} from "music/spotify-ts/spotify_local_service-proxy";
+import {SpotifyLocalService} from "music/gen/spotify-ts/spotify_local_service-proxy";
 import {Test} from "music/Test";
 import * as React from "react";
 import * as Eventbus from "vertx3-eventbus-client";
@@ -21,8 +21,8 @@ export class Hello extends React.Component<IHelloProps, {}> {
     });
     this.play = this.play.bind(this);
     const eb = new Eventbus("url");
-    const spotify = new SpotifyLocalService(eb, "url");
-    spotify.close();
+    // const spotify = new SpotifyLocalService(eb, "url");
+    // spotify.close();
   }
 
   public play() {
