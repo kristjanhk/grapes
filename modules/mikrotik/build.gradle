@@ -15,30 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-  id "com.moowork.node" version "1.2.0"
+dependencies {
+  compile project(':common')
+  compile project(':gateway')
+
+  compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}"
+  compile group: 'me.legrange', name: 'mikrotik', version: "${cfg.ver.mikrotik}"
 }
 
-task productionBundle(type: YarnTask) {
-  inputs.files(fileTree('../node_modules'))
-  inputs.files(file('../package.json'))
-  inputs.files(file('../webpack.common.js'))
-  inputs.files(file('../webpack.prod.js'))
-
-  inputs.files(fileTree('../common/ui'))
-  inputs.files(fileTree('../music/ui'))
-  inputs.files(fileTree('../mikrotik/ui'))
-
-  outputs.dir('main/resources/static/dist')
-
-  dependsOn yarn_install
-  args = ['run', 'prod']
-}
-
-mainClassName = 'eu.kyngas.grapes.gateway.GatewayVerticle'
+mainClassName = 'eu.kyngas.grapes.mikrotik.MikrotikVerticle'
 
 shadowJar {
-  classifier = 'gateway'
+  classifier = 'mikrotik'
 }
-
-jar.dependsOn productionBundle

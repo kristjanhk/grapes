@@ -15,30 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-  id "com.moowork.node" version "1.2.0"
-}
+@ModuleGen(name = "ping", groupPackage = "eu.kyngas.grapes.mikrotik.ping")
+package eu.kyngas.grapes.mikrotik.ping;
 
-task productionBundle(type: YarnTask) {
-  inputs.files(fileTree('../node_modules'))
-  inputs.files(file('../package.json'))
-  inputs.files(file('../webpack.common.js'))
-  inputs.files(file('../webpack.prod.js'))
-
-  inputs.files(fileTree('../common/ui'))
-  inputs.files(fileTree('../music/ui'))
-  inputs.files(fileTree('../mikrotik/ui'))
-
-  outputs.dir('main/resources/static/dist')
-
-  dependsOn yarn_install
-  args = ['run', 'prod']
-}
-
-mainClassName = 'eu.kyngas.grapes.gateway.GatewayVerticle'
-
-shadowJar {
-  classifier = 'gateway'
-}
-
-jar.dependsOn productionBundle
+import io.vertx.codegen.annotations.ModuleGen;

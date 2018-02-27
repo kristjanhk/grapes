@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/modules/common" />
             <option value="$PROJECT_DIR$/modules/deploy" />
             <option value="$PROJECT_DIR$/modules/gateway" />
+            <option value="$PROJECT_DIR$/modules/mikrotik" />
             <option value="$PROJECT_DIR$/modules/music" />
           </set>
         </option>

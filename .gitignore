@@ -25,3 +25,4 @@ gradlew.bat
 /misc/id_rsa
 /modules/node_modules/
 /modules/yarn.lock
+/modules/mikrotik/main/resources/mikrotik.json

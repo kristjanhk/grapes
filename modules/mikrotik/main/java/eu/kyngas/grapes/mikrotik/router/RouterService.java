@@ -15,30 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-  id "com.moowork.node" version "1.2.0"
+package eu.kyngas.grapes.mikrotik.router;
+
+import eu.kyngas.grapes.common.util.Ctx;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
+/**
+ * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
+ */
+public interface RouterService {
+
+  static RouterService create() {
+    return new RouterServiceImpl(Ctx.config());
+  }
+
+  void restartLte(Handler<AsyncResult<Void>> handler);
+
+  void restartSystem(Handler<AsyncResult<Void>> handler);
+
+  void close(Handler<Void> handler);
 }
-
-task productionBundle(type: YarnTask) {
-  inputs.files(fileTree('../node_modules'))
-  inputs.files(file('../package.json'))
-  inputs.files(file('../webpack.common.js'))
-  inputs.files(file('../webpack.prod.js'))
-
-  inputs.files(fileTree('../common/ui'))
-  inputs.files(fileTree('../music/ui'))
-  inputs.files(fileTree('../mikrotik/ui'))
-
-  outputs.dir('main/resources/static/dist')
-
-  dependsOn yarn_install
-  args = ['run', 'prod']
-}
-
-mainClassName = 'eu.kyngas.grapes.gateway.GatewayVerticle'
-
-shadowJar {
-  classifier = 'gateway'
-}
-
-jar.dependsOn productionBundle
