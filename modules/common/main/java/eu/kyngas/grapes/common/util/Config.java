@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 public class Config {
-  private static final String DEFAULT_CONFIG = "/global.json";
+  private static final String GLOBAL_CONFIG = "/global.json";
   private static final boolean IS_RUNNING_FROM_JAR = getLocation().toString().endsWith(".jar");
 
   public static JsonObj getConfig(String location, String[] args) {
@@ -30,18 +30,27 @@ public class Config {
   }
 
   public static JsonObj getConfig(String[] args) {
-    return getConfig(DEFAULT_CONFIG, args);
+    return getConfig(GLOBAL_CONFIG, args);
   }
 
   public static JsonObj getGlobal() {
-    return getConfig(DEFAULT_CONFIG);
+    return getConfig(GLOBAL_CONFIG);
   }
 
   public static JsonObj getConfig(String location) {
     try {
-      return new JsonObj(readToString(checkFormat(location)));
+      String formattedLocation = checkFormat(location);
+      return getDefaultConfig(formattedLocation).mergeIn(new JsonObj(readToString(formattedLocation)));
     } catch (IOException e) {
       log.error("Config {} not found.", location);
+    }
+    return new JsonObj();
+  }
+
+  private static JsonObj getDefaultConfig(String location) {
+    try {
+      return new JsonObj(readToString(location.replace(".json", "-default.json")));
+    } catch (IOException ignored) {
     }
     return new JsonObj();
   }
@@ -59,7 +68,7 @@ public class Config {
 
   private static String checkFormat(String location) {
     if (location == null) {
-      return DEFAULT_CONFIG;
+      return GLOBAL_CONFIG;
     }
     if (location.charAt(0) != '/') {
       location = "/" + location;

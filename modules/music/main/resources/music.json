@@ -7,8 +7,6 @@
     "ssl": true,
     "auth": {
       "host": "accounts.spotify.com",
-      "client_id": "",
-      "client_secret": "",
       "redirect_uri": "/spotify/callback"
     }
   },

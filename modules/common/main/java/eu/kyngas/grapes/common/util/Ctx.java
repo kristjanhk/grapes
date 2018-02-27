@@ -33,7 +33,7 @@ public class Ctx {
     return Config.getSubConfig(config(), subKeys);
   }
 
-  public static void createVertx(Consumer<Vertx> consumer) {
+  public static void create(Consumer<Vertx> consumer) {
     N.safe(consumer, c -> c.accept(Vertx.vertx()));
   }
 

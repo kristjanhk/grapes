@@ -22,13 +22,13 @@ import eu.kyngas.grapes.common.entity.Verticle;
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.common.util.H;
 import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.music.router.MainRouter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -52,9 +52,9 @@ public class MusicVerticle extends Verticle {
     Logs.setLoggingToSLF4J();
     JsonObject arguments = Config.getArgs(args);
     JsonObj config = Config.getGlobal().mergeIn(Config.getConfig("music"));
-    Ctx.createVertx(vertx -> vertx.deployVerticle(new MusicVerticle(),
-                                                  new DeploymentOptions().setConfig(config.mergeIn(arguments)),
-                                                  handleVerticleStarted(vertx)));
+    Ctx.create(vertx -> vertx.deployVerticle(new MusicVerticle(),
+                                             new DeploymentOptions().setConfig(config.mergeIn(arguments)),
+                                             ar -> H.handleVerticleStarted(vertx, "Music").handle(ar)));
   }
 
   @Override
@@ -90,12 +90,5 @@ public class MusicVerticle extends Verticle {
       Logs.error("Failed to properly close http server", ar.cause());
       fut.fail(ar.cause());
     }));
-  }
-
-  private static Handler<AsyncResult<String>> handleVerticleStarted(Vertx vertx) {
-    return ar -> C.check(ar.succeeded(), () -> Logs.info("Music module started"), () -> {
-      Logs.error("Failed to start Music Module", ar.cause());
-      vertx.close();
-    });
   }
 }

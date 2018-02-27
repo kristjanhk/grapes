@@ -17,7 +17,9 @@
 
 package eu.kyngas.grapes.common.util;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
@@ -39,6 +41,13 @@ public class H {
   public static Handler<HttpClientResponse> logResponse(Consumer<HttpClientResponse> consumer) {
     return response -> N.safe(consumer, c -> {
 
+    });
+  }
+
+  public static Handler<AsyncResult<String>> handleVerticleStarted(Vertx vertx, String moduleName) {
+    return ar -> C.check(ar.succeeded(), () -> Logs.info(4, "{} module started.", moduleName), () -> {
+      Logs.error(4, "Failed to start {} module.", moduleName, ar.cause());
+      vertx.close();
     });
   }
 }

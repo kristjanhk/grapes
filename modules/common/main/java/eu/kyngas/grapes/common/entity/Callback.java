@@ -15,28 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.common.util;
-
-import io.vertx.core.Future;
+package eu.kyngas.grapes.common.entity;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class F {
+public interface Callback {
 
-  public static <T> Future<T> fail(String format, Object... params) {
-    return Future.failedFuture(String.format(format, params));
-  }
-
-  public static <T> Future<T> fail(Throwable throwable) {
-    return Future.failedFuture(throwable);
-  }
-
-  public static <T> Future<T> success() {
-    return Future.succeededFuture();
-  }
-
-  public static <T> Future<T> success(T response) {
-    return Future.succeededFuture(response);
-  }
+  void exec() throws Exception;
 }
