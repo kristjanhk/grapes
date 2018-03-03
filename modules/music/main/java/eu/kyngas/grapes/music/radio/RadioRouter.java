@@ -17,13 +17,19 @@
 
 package eu.kyngas.grapes.music.radio;
 
-import eu.kyngas.grapes.music.router.RestRouter;
+import eu.kyngas.grapes.common.router.AbstractRouter;
+import eu.kyngas.grapes.common.router.RestRouter;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class RadioRouter extends RestRouter {
+public class RadioRouter extends AbstractRouter implements RestRouter {
   private final RadioService radioService = RadioService.create();
+
+  @Override
+  public String getPath() {
+    return "/radio";
+  }
 
   @Override
   public void addRoutes() {

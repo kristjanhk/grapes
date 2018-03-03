@@ -15,17 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.router;
+package eu.kyngas.grapes.common.router;
 
-import eu.kyngas.grapes.common.router.Status;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.Logs;
-import eu.kyngas.grapes.common.util.Strings;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.RouterImpl;
 import java.util.function.Consumer;
@@ -33,20 +29,11 @@ import java.util.function.Consumer;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public abstract class RestRouter extends RouterImpl {
+public abstract class AbstractRouter extends RouterImpl {
 
-  public RestRouter() {
+  public AbstractRouter() {
     super(Ctx.vertx());
   }
-
-  public void subRouterTo(Router parent, String path) {
-    parent.mountSubRouter(path, this);
-    addRoutes();
-    Logs.debug("{} registered routes under {}: {}",
-               getClass().getSimpleName(), path, Strings.join(getRoutes(), Route::getPath));
-  }
-
-  protected abstract void addRoutes();
 
   protected <T> Handler<AsyncResult<T>> handler(RoutingContext ctx, Consumer<T> consumer) {
     return ar -> {

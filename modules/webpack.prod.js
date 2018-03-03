@@ -25,6 +25,6 @@ module.exports = new Merge(CommonConfig, {
     publicPath: '/static/dist/'
   },
   plugins: [
-    //new CleanWebpackPlugin(['./main/resources/static/dist']),
+    new CleanWebpackPlugin(['./gateway/main/resources/static/dist']),
   ]
 });

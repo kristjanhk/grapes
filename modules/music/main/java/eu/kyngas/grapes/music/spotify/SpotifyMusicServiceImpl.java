@@ -17,22 +17,25 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.service.ProxyServiceImpl;
 import eu.kyngas.grapes.common.util.Ctx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class SpotifyMusicServiceImpl implements SpotifyMusicService {
+public class SpotifyMusicServiceImpl extends ProxyServiceImpl<SpotifyMusicService> implements SpotifyMusicService {
   private final JsonObject config;
   private final Vertx vertx = Ctx.vertx();
+
+  SpotifyMusicServiceImpl(JsonObject config) {
+    super(ADDRESS, SpotifyMusicService.class);
+    this.config = config;
+  }
 
   @Override
   public SpotifyMusicService getTestData(Handler<AsyncResult<JsonObject>> handler) {

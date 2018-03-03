@@ -24,7 +24,6 @@ import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.H;
 import eu.kyngas.grapes.common.util.Logs;
-import eu.kyngas.grapes.music.router.MainRouter;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -59,12 +58,13 @@ public class MusicVerticle extends Verticle {
 
   @Override
   public void start(Future<Void> future) {
-    Router router = MainRouter.create();
+    Router router = new MainRouter();
     String staticFilesPath = isRunningFromJar() ? STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString();
     router.get(STATIC_PATH).handler(StaticHandler.create(staticFilesPath)
                                                  .setCachingEnabled(false)
                                                  .setIncludeHidden(false)
                                                  .setDirectoryListing(true));
+    Logs.info("Static files served from {}", "https://kyngas.eu/static/");
     server = vertx.createHttpServer()
                   .requestHandler(router::accept)
                   .listen(config().getInteger(HTTP_PORT, 8085),

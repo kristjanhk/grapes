@@ -26,8 +26,12 @@ public class N {
     return obj;
   }
 
-  public static <T> T ifMissing(T input, Supplier<T> ifMissing) {
-    return input == null ? ifMissing.get() : input;
+  public static <T> T ifExists(T in, Supplier<T> ifExists) {
+    return in != null ? ifExists.get() : null;
+  }
+
+  public static <T> T ifNotExists(T in, Supplier<T> ifNotExists) {
+    return in == null ? ifNotExists.get() : in;
   }
 
   public static boolean anyNull(Object... objs) {

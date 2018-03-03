@@ -15,26 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.common.service;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import eu.kyngas.grapes.common.util.Unsafe;
+import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.serviceproxy.ServiceBinder;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public abstract class ProxyServiceImpl<T> implements ProxyService {
+  protected final ServiceBinder serviceBinder;
+  protected final MessageConsumer<JsonObject> messageConsumer;
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
+  protected ProxyServiceImpl(String address, Class<T> serviceClass) {
+    this.serviceBinder = new ServiceBinder(Ctx.vertx());
+    this.messageConsumer = this.serviceBinder.setAddress(address).register(serviceClass, Unsafe.cast(this));
   }
 
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
-
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
+  @Override
+  public void close() {
+    serviceBinder.unregister(messageConsumer);
+  }
 }

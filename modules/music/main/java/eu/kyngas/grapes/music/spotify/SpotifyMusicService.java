@@ -17,8 +17,10 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.service.ProxyService;
 import eu.kyngas.grapes.common.util.Ctx;
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.ProxyClose;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -38,9 +40,12 @@ public interface SpotifyMusicService extends SpotifyService {
   }
 
   static SpotifyMusicService createProxy() {
-    return new SpotifyMusicServiceVertxEBProxy(Ctx.vertx(), ADDRESS);
+    return ProxyService.createProxy(ADDRESS, SpotifyMusicService.class);
   }
 
   @Fluent
   SpotifyMusicService getTestData(Handler<AsyncResult<JsonObject>> handler);
+
+  @ProxyClose
+  void close();
 }

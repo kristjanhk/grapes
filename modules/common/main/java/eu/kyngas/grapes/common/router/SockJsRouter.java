@@ -15,26 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.common.router;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.bridge.PermittedOptions;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.sockjs.BridgeEvent;
+import java.util.List;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public interface SockJsRouter extends Router {
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
-  }
+  void permitRoutes(List<PermittedOptions> inbound, List<PermittedOptions> outbound);
 
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
-
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
+  void intercept(BridgeEvent event);
 }

@@ -23,4 +23,5 @@ package eu.kyngas.grapes.music.spotify;
 public interface SpotifyService {
   String SPOTIFY = "spotify";
   String AUTH = "auth";
+  String SECRET = "spotify-secret";
 }

@@ -2,6 +2,8 @@
   "extends": ["tslint:latest", "tslint-react"],
   "rules": {
     "no-submodule-imports": false,
-    "no-implicit-dependencies": false
+    "no-implicit-dependencies": false,
+    "no-console": false,
+    "no-trailing-whitespace": false
   }
 }

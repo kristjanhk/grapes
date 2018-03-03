@@ -15,26 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.common.util;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import static eu.kyngas.grapes.common.util.Unsafe.cast;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public class Safe {
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
+  public static <T> T safeCast(Object in) {
+    try {
+      return cast(in);
+    } catch (ClassCastException ignored) {
+      return null;
+    }
   }
-
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
-
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
 }

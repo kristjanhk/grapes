@@ -15,26 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.common.service;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.codegen.annotations.ProxyIgnore;
+import io.vertx.serviceproxy.ServiceProxyBuilder;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public interface ProxyService {
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
+  @ProxyIgnore
+  static <T> T createProxy(String address, Class<T> serviceClass) {
+    return new ServiceProxyBuilder(Ctx.vertx()).setAddress(address).build(serviceClass);
   }
 
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
-
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
+  void close();
 }

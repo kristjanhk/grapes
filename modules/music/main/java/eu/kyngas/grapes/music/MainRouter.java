@@ -15,26 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.music;
 
-import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import eu.kyngas.grapes.common.router.AbstractMainRouter;
+import eu.kyngas.grapes.music.radio.RadioRouter;
+import eu.kyngas.grapes.music.spotify.SpotifyRouter;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
+public class MainRouter extends AbstractMainRouter {
 
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
+  public MainRouter() {
+    SpotifyRouter spotifyRouter = new SpotifyRouter();
+    restRouters.add(spotifyRouter);
+    sockJsRouters.add(spotifyRouter);
+    restRouters.add(new RadioRouter());
   }
-
-  SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
-
-  SpotifyAuthService doCallback(RoutingContext ctx, Handler<AsyncResult<JsonObject>> handler);
 }

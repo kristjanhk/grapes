@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
-import static eu.kyngas.grapes.common.util.N.ifMissing;
+import static eu.kyngas.grapes.common.util.N.ifNotExists;
 
 /**
  * Implementation of JsonObject that avoids casting exceptions and attempts to parse values.
@@ -355,13 +355,13 @@ public class JsonObj extends JsonObject {
     Object parsedValue;
     String stringValue = value.toString();
     parsedValue = PARSER_MAP.get(Integer.class).apply(stringValue);
-    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Long.class).apply(stringValue));
-    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Float.class).apply(stringValue));
-    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Double.class).apply(stringValue));
-    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(JsonObj.class).apply(stringValue));
-    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(JsonArray.class).apply(stringValue));
+    parsedValue = ifNotExists(parsedValue, () -> PARSER_MAP.get(Long.class).apply(stringValue));
+    parsedValue = ifNotExists(parsedValue, () -> PARSER_MAP.get(Float.class).apply(stringValue));
+    parsedValue = ifNotExists(parsedValue, () -> PARSER_MAP.get(Double.class).apply(stringValue));
+    parsedValue = ifNotExists(parsedValue, () -> PARSER_MAP.get(JsonObj.class).apply(stringValue));
+    parsedValue = ifNotExists(parsedValue, () -> PARSER_MAP.get(JsonArray.class).apply(stringValue));
     // TODO: 25.09.2017 boolean
-    parsedValue = ifMissing(parsedValue, () -> stringValue);
+    parsedValue = ifNotExists(parsedValue, () -> stringValue);
     put(key, parsedValue);
     return this;
   }

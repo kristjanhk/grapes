@@ -15,33 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.router;
+package eu.kyngas.grapes.common.router;
 
-import eu.kyngas.grapes.common.util.Ctx;
-import eu.kyngas.grapes.music.spotify.SpotifyRouter;
-import eu.kyngas.grapes.music.radio.RadioRouter;
+import eu.kyngas.grapes.common.util.Logs;
+import eu.kyngas.grapes.common.util.Strings;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.impl.RouterImpl;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class MainRouter extends RouterImpl {
-  private final RestRouter spotifyRouter = new SpotifyRouter();
-  private final RestRouter radioRouter = new RadioRouter();
+public interface RestRouter extends Router {
 
-  private MainRouter() {
-    super(Ctx.vertx());
+  String getPath();
+
+  void addRoutes();
+
+  default void subRouterTo(Router parent, String path) {
+    parent.mountSubRouter(path, this);
+    addRoutes();
+    Logs.debug("{} registered routes under {}: {}",
+               getClass().getSimpleName(), path, Strings.join(getRoutes(), Route::getPath));
   }
 
-  public static Router create() {
-    return new MainRouter().initRoutes();
-  }
+  default void close() {
 
-  public Router initRoutes() {
-    // TODO: 1.02.2018 impl common routes -> static handler etc.
-    spotifyRouter.subRouterTo(this, "/spotify");
-    radioRouter.subRouterTo(this, "/radio");
-    return this;
   }
 }

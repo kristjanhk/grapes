@@ -21,7 +21,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
 import java.util.function.Consumer;
 
@@ -36,12 +35,6 @@ public class H {
       Logs.info("Response json: {}", json);
       N.safe(consumer, c -> c.accept(json));
     };
-  }
-
-  public static Handler<HttpClientResponse> logResponse(Consumer<HttpClientResponse> consumer) {
-    return response -> N.safe(consumer, c -> {
-
-    });
   }
 
   public static Handler<AsyncResult<String>> handleVerticleStarted(Vertx vertx, String moduleName) {

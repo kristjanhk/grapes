@@ -17,6 +17,7 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.service.ProxyServiceImpl;
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.F;
@@ -27,8 +28,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.freedesktop.DBus;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
@@ -39,8 +38,7 @@ import org.freedesktop.dbus.exceptions.DBusException;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class SpotifyLocalServiceImpl implements SpotifyLocalService {
+public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalService> implements SpotifyLocalService {
   private static final String DBUS_SERVICE_SPOTIFY = "org.mpris.MediaPlayer2.spotify";
   private static final String DBUS_SERVICE_PLAYER = "org.mpris.MediaPlayer2.Player";
   private static final String DBUS_MPRIS_PLAYER = "/org/mpris/MediaPlayer2";
@@ -49,6 +47,10 @@ public class SpotifyLocalServiceImpl implements SpotifyLocalService {
   private final String dbusAddress = getDBusAddressFromFile();
   private DBusConnection conn;
   private Player player;
+
+  SpotifyLocalServiceImpl() {
+    super(ADDRESS, SpotifyLocalService.class);
+  }
 
   private <T> void checkConnection(Handler<AsyncResult<T>> handler, Runnable ifConnected) {
     if (!Networks.getInstance().isProduction()) {
@@ -135,6 +137,7 @@ public class SpotifyLocalServiceImpl implements SpotifyLocalService {
   @Override
   public void close() {
     disconnect();
+    super.close();
   }
 
   @DBusInterfaceName(DBUS_SERVICE_PLAYER)

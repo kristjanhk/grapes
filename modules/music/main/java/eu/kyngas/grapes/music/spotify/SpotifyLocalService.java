@@ -17,7 +17,7 @@
 
 package eu.kyngas.grapes.music.spotify;
 
-import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.common.service.ProxyService;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.ProxyClose;
 import io.vertx.codegen.annotations.ProxyGen;
@@ -39,7 +39,7 @@ public interface SpotifyLocalService extends SpotifyService {
   }
 
   static SpotifyLocalService createProxy() {
-    return new SpotifyLocalServiceVertxEBProxy(Ctx.vertx(), ADDRESS);
+    return ProxyService.createProxy(ADDRESS, SpotifyLocalService.class);
   }
 
   @Fluent
