@@ -26,7 +26,7 @@ export class Hello extends React.Component<IHelloProps, IState> {
       html5: true,
       src: "https://kyngas.eu/radio/stream",
     });
-    this.howler.play();
+    //this.howler.play();
     this.playUri = this.playUri.bind(this);
     const eb = new Eventbus("https://kyngas.eu/eventbus");
     eb.onopen = () => {
@@ -46,11 +46,16 @@ export class Hello extends React.Component<IHelloProps, IState> {
     }
   }
 
+  public play() {
+    this.howler.play();
+  }
+
   public render() {
     return (
         <div>
           <h1>Hello from {this.props.compiler} and {this.props.framework}!</h1>
           {this.state.ready ? <input onKeyPress={this.playUri}/> : null}
+          <a onClick={this.play}>Start radio</a>
         </div>
     );
   }

@@ -12,6 +12,7 @@
     "dev": "webpack-dev-server --config webpack.dev.js --open --hot"
   },
   "dependencies": {
+    "antd": "^3.2.3",
     "axios": "^0.17.1",
     "howler": "^2.0.8",
     "react": "^16.2.0",

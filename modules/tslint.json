@@ -4,6 +4,7 @@
     "no-submodule-imports": false,
     "no-implicit-dependencies": false,
     "no-console": false,
-    "no-trailing-whitespace": false
+    "no-trailing-whitespace": false,
+    "comment-format": false
   }
 }
