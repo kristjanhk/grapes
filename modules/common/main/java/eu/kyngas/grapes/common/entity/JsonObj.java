@@ -374,7 +374,11 @@ public class JsonObj extends JsonObject {
     return null;
   }
 
-  public JsonObj mergeIn(JsonObj other) {
+  public JsonObj mergeIn(JsonObject other) {
     return (JsonObj) super.mergeIn(other);
+  }
+
+  public JsonObj deepMergeIn(JsonObject other) {
+    return (JsonObj) super.mergeIn(other, true);
   }
 }

@@ -77,7 +77,8 @@ public class Logs {
             ? tuple.getThrowable().getMessage()
             : "Unknown cause";
 
-    Throwable throwable = hasEx ? tuple.getThrowable() : new Throwable("Unknown cause");
+    Throwable def = new Throwable("Unknown cause");
+    Throwable throwable = hasEx ? tuple.getThrowable() : def;
     throwable.setStackTrace(Arrays.stream(throwable.getStackTrace())
                                 .skip(hasEx ? 0 : skip + 1)
                                 .limit(8)
@@ -86,7 +87,9 @@ public class Logs {
                                                  LOGGER,
                                                  level,
                                                  message,
-                                                 level == Level.ERROR ? throwable : null,
+                                                 Eq.ne(throwable, def) && Eq.eq(level, Level.ERROR, Level.DEBUG)
+                                                     ? throwable
+                                                     : null,
                                                  null);
     loggingEvent.setCallerData(throwable.getStackTrace());
     return loggingEvent;

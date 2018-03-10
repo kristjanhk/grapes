@@ -29,7 +29,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import java.nio.file.Path;
@@ -49,10 +48,11 @@ public class MusicVerticle extends Verticle {
 
   public static void main(String[] args) {
     Logs.setLoggingToSLF4J();
-    JsonObject arguments = Config.getArgs(args);
-    JsonObj config = Config.getGlobal().mergeIn(Config.getConfig("music"));
+    JsonObj config = Config.getGlobal()
+        .deepMergeIn(Config.getConfig("music"))
+        .deepMergeIn(Config.getArgs(args));
     Ctx.create(vertx -> vertx.deployVerticle(new MusicVerticle(),
-                                             new DeploymentOptions().setConfig(config.mergeIn(arguments)),
+                                             new DeploymentOptions().setConfig(config),
                                              ar -> H.handleVerticleStarted(vertx, "Music").handle(ar)));
   }
 
@@ -79,7 +79,6 @@ public class MusicVerticle extends Verticle {
         future.fail(ar.cause());
         return;
       }
-      Logs.info("Http server started");
       future.complete();
     };
   }

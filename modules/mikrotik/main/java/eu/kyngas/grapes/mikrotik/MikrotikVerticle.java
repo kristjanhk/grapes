@@ -26,7 +26,6 @@ import eu.kyngas.grapes.mikrotik.ping.PingService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -36,10 +35,11 @@ public class MikrotikVerticle extends AbstractVerticle {
 
   public static void main(String[] args) {
     Logs.setLoggingToSLF4J();
-    JsonObject arguments = Config.getArgs(args);
-    JsonObj config = Config.getGlobal().mergeIn(Config.getConfig("mikrotik"));
+    JsonObj config = Config.getGlobal()
+        .deepMergeIn(Config.getConfig("mikrotik"))
+        .deepMergeIn(Config.getArgs(args));
     Ctx.create(vertx -> vertx.deployVerticle(new MikrotikVerticle(),
-                                             new DeploymentOptions().setConfig(config.mergeIn(arguments)),
+                                             new DeploymentOptions().setConfig(config),
                                              ar -> H.handleVerticleStarted(vertx, "Mikrotik").handle(ar)));
   }
 
