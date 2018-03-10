@@ -39,9 +39,12 @@ public abstract class AbstractMainRouter extends RouterImpl {
 
   public AbstractMainRouter() {
     super(Ctx.vertx());
+    init();
     initRoutes();
     initSockjsRoutes();
   }
+
+  protected abstract void init();
 
   protected void initRoutes() {
     // TODO: 1.02.2018 impl common routes -> static handler etc.
@@ -56,10 +59,12 @@ public abstract class AbstractMainRouter extends RouterImpl {
       router.permitRoutes(inbound, outbound);
       options.getInboundPermitteds().addAll(inbound);
       options.getOutboundPermitteds().addAll(outbound);
-      Logs.info("Sockjs router {} permitted inbound: {}, outbound: {}",
-                router.getClass().getSimpleName(),
-                permittedToString(inbound),
-                permittedToString(outbound));
+      C.ifFalse(inbound.isEmpty(), () -> Logs.debug("{} permitted inbound: {}",
+                                                    router.getClass().getSimpleName(),
+                                                    permittedToString(inbound)));
+      C.ifFalse(outbound.isEmpty(), () -> Logs.debug("{} permitted outbound: {}",
+                                                     router.getClass().getSimpleName(),
+                                                     permittedToString(outbound)));
     });
     route("/eventbus/*").handler(SockJSHandler.create(Ctx.vertx()).bridge(options, interceptor()));
   }

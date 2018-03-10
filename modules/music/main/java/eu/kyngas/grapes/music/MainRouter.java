@@ -26,7 +26,8 @@ import eu.kyngas.grapes.music.spotify.SpotifyRouter;
  */
 public class MainRouter extends AbstractMainRouter {
 
-  public MainRouter() {
+  @Override
+  protected void init() {
     SpotifyRouter spotifyRouter = new SpotifyRouter();
     restRouters.add(spotifyRouter);
     sockJsRouters.add(spotifyRouter);
