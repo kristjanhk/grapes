@@ -56,6 +56,7 @@ public class RouterServiceImpl implements RouterService {
 
   @Override
   public void restartLte(Handler<AsyncResult<Void>> handler) {
+    // TODO: 02/03/2018 test replace macid -> generate new one -> api call replace lte macid
     Logs.info("Disabling LTE");
     C.ifTrue(handleApiCall(() -> api.execute(String.format(lteRestartFormat, "yes")), handler),
              () -> enableLte(handler));

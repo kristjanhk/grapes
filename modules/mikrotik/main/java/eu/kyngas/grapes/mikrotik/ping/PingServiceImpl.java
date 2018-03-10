@@ -58,9 +58,6 @@ public class PingServiceImpl implements PingService {
   private boolean connected = true;
 
   public PingServiceImpl(JsonObject config) {
-    if (!IS_WINDOWS) {
-      throw new IllegalArgumentException("Unsupported platform");
-    }
     this.vertx = Ctx.vertx();
     this.pingHost = config.getString("ping-host");
     this.executor = Executors.newSingleThreadExecutor();
@@ -76,7 +73,7 @@ public class PingServiceImpl implements PingService {
         String line;
         while (running.get() && (line = reader.readLine()) != null) {
           String currentLine = line;
-          vertx.runOnContext(v -> logic(parse(currentLine)));
+          vertx.runOnContext(v -> logic(IS_WINDOWS ? parseWindows(currentLine) : parseLinux(currentLine)));
         }
         Logs.debug("Pinging stopped.");
         reader.close();
@@ -86,7 +83,7 @@ public class PingServiceImpl implements PingService {
     };
   }
 
-  private Ping parse(String input) {
+  private Ping parseWindows(String input) {
     if (input == null || input.trim().isEmpty() || input.startsWith("Pinging")) {
       return null;
     }
@@ -100,6 +97,20 @@ public class PingServiceImpl implements PingService {
     if (parts[1].contains("bytes")) {
       String host = parts[0].split(" ")[2];
       String time = parts[1].split(" ")[1].split("=")[1].replace("ms", "");
+      return new Ping(host, Integer.parseInt(time), true, null);
+    }
+    return new Ping(null, -1, false, "Unknown state");
+  }
+
+  private Ping parseLinux(String input) {
+    if (input == null || input.trim().isEmpty() || input.startsWith("PING")) {
+      return null;
+    }
+    String[] parts = input.split(": ");
+    //todo timeout, unreachable
+    if (parts[1].contains("bytes")) {
+      String host = parts[0].split(" ")[3];
+      String time = parts[1].split(" ")[2].split("=")[1].replace("\\d{1,4}.\\d ms", "");
       return new Ping(host, Integer.parseInt(time), true, null);
     }
     return new Ping(null, -1, false, "Unknown state");
