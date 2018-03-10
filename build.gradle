@@ -36,41 +36,41 @@ subprojects {
   }
 
   dependencies {
-    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${cfg.ver.lombok}"
-    compileOnly group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: "${cfg.ver.vertx}"
-    compileOnly group: 'io.vertx', name: 'vertx-lang-js', version: "${cfg.ver.vertx}"
+    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: cfg.ver.vertx
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: cfg.ver.lombok
+    compileOnly group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: cfg.ver.vertx
+    compileOnly group: 'io.vertx', name: 'vertx-lang-js', version: cfg.ver.vertx
 
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: "${cfg.ver.logback}"
-    compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
-    compile group: 'io.vertx', name: 'vertx-service-discovery', version: "${cfg.ver.vertx}"
-    compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${cfg.ver.vertx}"
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: cfg.ver.logback
+    compile group: 'io.vertx', name: 'vertx-core', version: cfg.ver.vertx
+    compile group: 'io.vertx', name: 'vertx-service-discovery', version: cfg.ver.vertx
+    compile group: 'io.vertx', name: 'vertx-service-proxy', version: cfg.ver.vertx
 
-    testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
+    testCompile group: 'junit', name: 'junit', version: cfg.ver.junit
   }
 
   sourceSets {
     main {
       java {
-        srcDirs = ["${cfg.dir.main.java}", "${cfg.dir.main.gen}"]
+        srcDirs = [cfg.dir.main.java, cfg.dir.main.gen]
       }
       resources {
-        srcDirs = ["${cfg.dir.main.resources}"]
+        srcDirs = [cfg.dir.main.resources]
       }
     }
     test {
       java {
-        srcDirs = ["${cfg.dir.test.java}"]
+        srcDirs = [cfg.dir.test.java]
       }
       resources {
-        srcDirs = ["${cfg.dir.test.resources}"]
+        srcDirs = [cfg.dir.test.resources]
       }
     }
   }
 
   idea {
     module {
-      generatedSourceDirs += file("${cfg.dir.main.gen}")
+      generatedSourceDirs += file(cfg.dir.main.gen)
       outputDir = file("${projectDir}${cfg.dir.build.main}")
       testOutputDir = file("${projectDir}${cfg.dir.build.test}")
     }
@@ -79,7 +79,7 @@ subprojects {
   task proxyGen(type: JavaCompile) {
     source = sourceSets.main.java
     classpath = configurations.compile + configurations.compileOnly
-    destinationDir = project.file("${cfg.dir.main.gen}")
+    destinationDir = project.file(cfg.dir.main.gen)
     options.compilerArgs = [
         '-proc:only',
         '-processor',
@@ -123,7 +123,7 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "${cfg.ver.gradle}"
+  gradleVersion = cfg.ver.gradle
   //noinspection UnnecessaryQualifiedReference
   distributionType = Wrapper.DistributionType.ALL
 }

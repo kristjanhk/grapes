@@ -26,3 +26,8 @@ gradlew.bat
 /modules/node_modules/
 /modules/yarn.lock
 /modules/mikrotik/main/resources/mikrotik.json
+/misc/ubuntu.ppk
+/misc/id_rsa_ubuntu
+/grapes.mv.db
+/grapes.trace.db
+/modules/database/main/resources/database-secret.json
