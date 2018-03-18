@@ -3,7 +3,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath group: 'com.esyfur', name: 'gradle-config-plugin', version: '0.4.5'
     classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '2.0.2'
   }
 }
@@ -12,7 +11,10 @@ plugins {
   id 'org.hidetake.ssh' version '2.9.0'
 }
 
-apply plugin: 'config'
+apply from: "$rootDir/common.gradle"
+
+loadProperties(project, true, "ver", "$rootDir/version.properties")
+loadProperties(project, true, "dir", "$rootDir/path.properties")
 
 subprojects {
   apply plugin: 'application'
@@ -22,8 +24,8 @@ subprojects {
 
   group 'eu.kyngas.grapes'
 
-  targetCompatibility = cfg.ver.java
-  sourceCompatibility = cfg.ver.java
+  targetCompatibility = ver.java
+  sourceCompatibility = ver.java
 
   repositories {
     mavenCentral()
@@ -36,56 +38,56 @@ subprojects {
   }
 
   dependencies {
-    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: cfg.ver.vertx
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: cfg.ver.lombok
-    compileOnly group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: cfg.ver.vertx
-    compileOnly group: 'io.vertx', name: 'vertx-lang-js', version: cfg.ver.vertx
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: ver.logback
+    compile group: 'io.vertx', name: 'vertx-core', version: ver.vertx
+    compile group: 'io.vertx', name: 'vertx-service-discovery', version: ver.vertx
+    compile group: 'io.vertx', name: 'vertx-service-proxy', version: ver.vertx
 
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: cfg.ver.logback
-    compile group: 'io.vertx', name: 'vertx-core', version: cfg.ver.vertx
-    compile group: 'io.vertx', name: 'vertx-service-discovery', version: cfg.ver.vertx
-    compile group: 'io.vertx', name: 'vertx-service-proxy', version: cfg.ver.vertx
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: ver.lombok
+    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: ver.vertx
+    compileOnly group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: ver.vertx
+    compileOnly group: 'io.vertx', name: 'vertx-lang-js', version: ver.vertx
 
-    testCompile group: 'junit', name: 'junit', version: cfg.ver.junit
+    testCompile group: 'io.vertx', name: 'vertx-junit5', version: ver.vertx
   }
 
   sourceSets {
     main {
       java {
-        srcDirs = [cfg.dir.main.java, cfg.dir.main.gen]
+        srcDirs = [dir.main_java, dir.main_gen]
       }
       resources {
-        srcDirs = [cfg.dir.main.resources]
+        srcDirs = [dir.main_resources]
       }
     }
     test {
       java {
-        srcDirs = [cfg.dir.test.java]
+        srcDirs = [dir.test_java]
       }
       resources {
-        srcDirs = [cfg.dir.test.resources]
+        srcDirs = [dir.test_resources]
       }
     }
   }
 
   idea {
     module {
-      generatedSourceDirs += file(cfg.dir.main.gen)
-      outputDir = file("${projectDir}${cfg.dir.build.main}")
-      testOutputDir = file("${projectDir}${cfg.dir.build.test}")
+      generatedSourceDirs += file(dir.main_gen)
+      outputDir = file("${projectDir}${dir.build_main}")
+      testOutputDir = file("${projectDir}${dir.build_test}")
     }
   }
 
   task proxyGen(type: JavaCompile) {
     source = sourceSets.main.java
     classpath = configurations.compile + configurations.compileOnly
-    destinationDir = project.file(cfg.dir.main.gen)
+    destinationDir = project.file(dir.main_gen)
     options.compilerArgs = [
         '-proc:only',
         '-processor',
         'io.vertx.codegen.CodeGenProcessor',
-        "-Acodegen.output=${project.projectDir}/${cfg.dir.main.gen}",
-        "-Acodegen.generators=${cfg.codegen.processors}"
+        "-Acodegen.output=${project.projectDir}/${dir.main_gen}",
+        "-Acodegen.generators=${ver.codegen_processors}"
     ]
   }
 
@@ -95,7 +97,7 @@ subprojects {
   }
 
   task proxyClean(type: Delete) {
-    delete "${cfg.dir.main.gen}"
+    delete "${dir.main_gen}"
   }
   clean.dependsOn proxyClean
 
@@ -123,7 +125,7 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = cfg.ver.gradle
+  gradleVersion = ver.gradle as String
   //noinspection UnnecessaryQualifiedReference
   distributionType = Wrapper.DistributionType.ALL
 }

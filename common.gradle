@@ -1,0 +1,20 @@
+private static load(String fileName) {
+  def fis = new FileInputStream(new File(fileName))
+  def props = new Properties()
+  props.load(fis)
+  fis.close()
+  return props
+}
+
+def loadProperties(Project project, boolean includeSubprojects, String extKey, String fileName) {
+  def props = load(fileName)
+  if (includeSubprojects) {
+    project.allprojects { ext.set(extKey, props) }
+  } else {
+    project.ext.set(extKey, props)
+  }
+}
+
+ext {
+  loadProperties = this.&loadProperties
+}

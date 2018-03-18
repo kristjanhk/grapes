@@ -19,8 +19,8 @@ dependencies {
   compile project(':common')
   compile project(':gateway')
 
-  compile group: 'io.vertx', name: 'vertx-web', version: cfg.ver.vertx
-  compile group: 'me.legrange', name: 'mikrotik', version: cfg.ver.mikrotik
+  compile group: 'io.vertx', name: 'vertx-web', version: ver.vertx
+  compile group: 'me.legrange', name: 'mikrotik', version: ver.mikrotik
 }
 
 mainClassName = 'eu.kyngas.grapes.mikrotik.MikrotikVerticle'
