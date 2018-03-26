@@ -1,17 +1,28 @@
-private static load(String fileName) {
-  def fis = new FileInputStream(new File(fileName))
-  def props = new Properties()
+import java.nio.file.Files
+
+private static Properties load(String fileName) {
+  FileInputStream fis = resolveFile(fileName)
+  Properties props = new Properties()
   props.load(fis)
   fis.close()
   return props
 }
 
+private static FileInputStream resolveFile(String fileName) {
+  java.nio.file.Path path = new File(fileName).getAbsoluteFile().toPath()
+  while (true) {
+    if (Files.exists(path)) {
+      return new FileInputStream(path.toFile())
+    }
+    path = path.getParent().resolveSibling(fileName)
+  }
+}
+
 def loadProperties(Project project, boolean includeSubprojects, String extKey, String fileName) {
-  def props = load(fileName)
+  Properties props = load(fileName)
+  project.ext.set(extKey, props)
   if (includeSubprojects) {
-    project.allprojects { ext.set(extKey, props) }
-  } else {
-    project.ext.set(extKey, props)
+    project.subprojects { ext.set(extKey, props) }
   }
 }
 

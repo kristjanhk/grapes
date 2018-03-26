@@ -1,14 +1,12 @@
 rootProject.name = 'grapes'
 
-//core
-include ':core'
-
 //modules
 include ':common'
 include ':music'
 include ':deploy'
 include ':gateway'
 include ':mikrotik'
+include ':database'
 
 //module paths
 project(':common').projectDir = "$rootDir/modules/common" as File
@@ -16,3 +14,4 @@ project(':music').projectDir = "$rootDir/modules/music" as File
 project(':deploy').projectDir = "$rootDir/modules/deploy" as File
 project(':gateway').projectDir = "$rootDir/modules/gateway" as File
 project(':mikrotik').projectDir = "$rootDir/modules/mikrotik" as File
+project(':database').projectDir = "$rootDir/modules/database" as File

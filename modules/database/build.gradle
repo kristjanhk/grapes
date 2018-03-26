@@ -1,0 +1,101 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath group: 'com.h2database', name: 'h2', version: ver.h2
+    classpath group: 'io.github.jklingsporn', name: 'vertx-jooq-generate', version: ver.vertxjooq
+  }
+}
+
+plugins {
+  id 'nu.studer.jooq' version '2.0.9'
+  id "org.flywaydb.flyway" version '5.0.7'
+  id 'pl.codelabs.flywayJooq' version '1.3.1'
+}
+
+apply from: "$rootDir/common.gradle"
+
+loadProperties(project, false, 'databaseProps', "$projectDir/${dir.main_resources}/database.properties")
+loadProperties(project, false, 'databaseSecretProps', "$projectDir/${dir.main_resources}/database-secret.properties")
+
+dependencies {
+  compile project(':common')
+
+  compile group: 'io.vertx', name: 'vertx-web', version: ver.vertx
+  compile group: 'com.h2database', name: 'h2', version: ver.h2
+  compile group: 'org.flywaydb', name: 'flyway-core', version: ver.flyway
+  compile group: 'io.github.jklingsporn', name: 'vertx-jooq-classic-jdbc', version: ver.vertxjooq
+
+  jooqRuntime group: 'io.github.jklingsporn', name: 'vertx-jooq-generate', version: ver.vertxjooq
+  jooqRuntime group: 'com.h2database', name: 'h2', version: ver.h2
+}
+
+mainClassName = 'eu.kyngas.grapes.database.DatabaseVerticle'
+
+shadowJar {
+  classifier = 'database'
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs += "$rootDir/buildSrc/main/java"
+    }
+  }
+}
+
+flyway {
+  url = databaseProps.url_build
+  user = databaseSecretProps.user
+  password = databaseSecretProps.password
+  locations = [databaseProps.location_development]
+  sqlMigrationPrefix = databaseProps.prefix
+  sqlMigrationSeparator = databaseProps.separator
+  outOfOrder = databaseProps.out_of_order.toBoolean()
+  schemas = [databaseProps.schema]
+}
+
+jooq {
+  grapes(sourceSets.main) {
+    jdbc {
+      driver = 'org.h2.Driver'
+      url = databaseProps.url_build
+      user = databaseSecretProps.user
+      password = databaseSecretProps.password
+      schema = databaseProps.schema
+    }
+    generator {
+      name = 'io.github.jklingsporn.vertx.jooq.generate.VertxGenerator'
+      strategy {
+        name = 'io.github.jklingsporn.vertx.jooq.generate.classic.JDBCClassicVertxGeneratorStrategy'
+      }
+      database {
+        name = 'org.jooq.util.h2.H2Database'
+        includes = '.*'
+        excludes = 'schema_version|flyway_schema_history|.*_A'
+        inputSchema = databaseProps.schema
+        includeTables = true
+        includeRoutines = true
+        includePackages = false
+        includeUDTs = true
+        includeSequences = true
+      }
+      generate {
+        deprecated = false
+        records = false
+        interfaces = true
+        fluentSetters = true
+        pojos = true
+        daos = true
+      }
+      target {
+        packageName = 'eu.kyngas.grapes.database'
+        directory = dir.main_gen
+      }
+    }
+  }
+}
+
+generateGrapesJooqSchemaSource.dependsOn flywayMigrate

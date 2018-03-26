@@ -30,4 +30,5 @@ gradlew.bat
 /misc/id_rsa_ubuntu
 /grapes.mv.db
 /grapes.trace.db
-/modules/database/main/resources/database-secret.json
+/modules/database/main/resources/database-secret.properties
+/.idea/dataSources.xml

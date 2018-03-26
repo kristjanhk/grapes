@@ -130,7 +130,7 @@ task wrapper(type: Wrapper) {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-static List<String> getDebugOptions() {
+private static List<String> getDebugOptions() {
   String debugger = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
   String eventLoopChecker = "-Dvertx.options.maxEventLoopExecuteTime=${Long.MAX_VALUE}"
   String workerChecker = "-Dvertx.options.maxWorkerExecuteTime=${Long.MAX_VALUE}"
@@ -138,11 +138,11 @@ static List<String> getDebugOptions() {
   return [debugger, eventLoopChecker, workerChecker, mark]
 }
 
-static String getBundleName(shadow) {
+private static String getBundleName(shadow) {
   return "${shadow.baseName}-${shadow.classifier}.jar"
 }
 
-static String getServerOutputDir(remotes) {
+private static String getServerOutputDir(remotes) {
   return "/home/${remotes.kyngas.user}/Downloads/"
 }
 

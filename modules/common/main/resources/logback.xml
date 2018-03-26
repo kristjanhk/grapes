@@ -3,6 +3,8 @@
     <logger name="com.mchange" level="INFO"/>
     <logger name="com.mchange.v2" level="WARN"/>
     <logger name="org.freedesktop.dbus" level="INFO"/>
+    <logger name="org.jooq" level="WARN"/>
+    <logger name="org.flywaydb" level="INFO"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %highlight(%-1level) \(%file:%line\) - %msg %n</pattern>
