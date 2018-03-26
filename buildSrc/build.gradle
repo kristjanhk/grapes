@@ -1,0 +1,34 @@
+repositories {
+  mavenCentral()
+}
+
+apply from: "../common.gradle"
+
+loadProperties(project, false, "ver", "version.properties")
+loadProperties(project, false, "dir", "path.properties")
+
+dependencies {
+  compile localGroovy()
+  compile gradleApi()
+  compile group: 'com.h2database', name: 'h2', version: ver.h2
+  compile group: 'org.jooq', name: 'jooq', version: ver.jooq
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = [dir.main_java, dir.main_gen]
+    }
+    resources {
+      srcDirs = [dir.main_resources]
+    }
+  }
+  test {
+    java {
+      srcDirs = [dir.test_java]
+    }
+    resources {
+      srcDirs = [dir.test_resources]
+    }
+  }
+}
