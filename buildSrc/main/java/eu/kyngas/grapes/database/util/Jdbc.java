@@ -17,6 +17,8 @@
 
 package eu.kyngas.grapes.database.util;
 
+import eu.kyngas.grapes.database.entity.Column;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,6 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.h2.tools.SimpleResultSet;
+import org.jooq.DataType;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DefaultDataType;
+import static eu.kyngas.grapes.database.util.Audit.*;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -52,5 +58,17 @@ public class Jdbc {
   @FunctionalInterface
   public interface SqlFunction<T, S> {
     S apply(T in) throws SQLException;
+  }
+
+  public static List<Column> getColumns(Connection conn, String tableName) throws SQLException {
+    ResultSet columnResultSet = conn.getMetaData().getColumns(null, SCHEMA, tableName, null);
+    Jdbc.SqlFunction<ResultSet, Column> columnMapper = row -> {
+      String name = row.getString(4);
+      String typeName = row.getString(6);
+      int typeLength = row.getInt(7);
+      DataType<?> type = DefaultDataType.getDataType(SQLDialect.H2, typeName).length(typeLength);
+      return new Column(name, type);
+    };
+    return Jdbc.resultSetToList(columnResultSet, columnMapper);
   }
 }

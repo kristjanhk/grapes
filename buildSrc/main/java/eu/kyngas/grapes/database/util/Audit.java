@@ -20,6 +20,7 @@ package eu.kyngas.grapes.database.util;
 import eu.kyngas.grapes.database.entity.Column;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -31,6 +32,8 @@ public class Audit {
   public static final String ID_A = "ID_A";
   public static final String SYS_VERSION = "SYS_VERSION";
   public static final String SYS_DELETED = "SYS_DELETED";
+  public static final String SYS_TIME = "SYS_TIME";
+  public static final String SYS_USER = "SYS_USER";
   public static final String PK_PREFIX = "PK_";
 
   private Audit() {
@@ -40,5 +43,9 @@ public class Audit {
     columns.forEach(column -> Arrays.stream(names).filter(name -> name.equals(column.getName())).forEach(name -> {
       throw new IllegalArgumentException(String.format("Regular table cannot contain column with name '%s'", name));
     }));
+  }
+
+  public static String getAuditTableName(String tableName) {
+    return tableName.toUpperCase(Locale.ENGLISH) + SUFFIX;
   }
 }

@@ -22,7 +22,6 @@ import eu.kyngas.grapes.database.util.Audit;
 import eu.kyngas.grapes.database.util.Jdbc;
 import eu.kyngas.grapes.database.util.Jooq;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,20 +30,17 @@ import org.jooq.CreateTableColumnStep;
 import org.jooq.CreateTableConstraintStep;
 import org.jooq.DSLContext;
 import org.jooq.DataType;
-import org.jooq.SQLDialect;
 import org.jooq.conf.ParamType;
-import org.jooq.impl.DefaultDataType;
 import org.jooq.impl.SQLDataType;
 import static eu.kyngas.grapes.database.util.Audit.*;
 import static org.jooq.impl.DSL.*;
+
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 @SuppressWarnings("unused")
 public class AuditTableCreator {
-  private static final String SYS_TIME = "SYS_TIME";
-  private static final String SYS_USER = "SYS_USER";
   private static final String INTEGER = "INTEGER";
   private static final String AUTO_INC = "AUTO_INCREMENT";
 
@@ -55,23 +51,10 @@ public class AuditTableCreator {
     createSysFields(dsl, tableName);
   }
 
-  private static List<Column> getColumns(Connection conn, String tableName) throws SQLException {
-    ResultSet columnResultSet = conn.getMetaData().getColumns(null, SCHEMA, tableName, null);
-    Jdbc.SqlFunction<ResultSet, Column> columnMapper = row -> {
-      String name = row.getString(4);
-      String typeName = row.getString(6);
-      int typeLength = row.getInt(7);
-      DataType<?> type = DefaultDataType.getDataType(SQLDialect.H2, typeName).length(typeLength);
-      return new Column(name, type);
-    };
-    List<Column> columns = Jdbc.resultSetToList(columnResultSet, columnMapper);
-    Audit.checkIllegalColumnNames(columns, ID_A, SYS_VERSION, SYS_DELETED);
-    return columns;
-  }
-
   private static void createTable(Connection conn, DSLContext dsl, String tableName) throws SQLException {
-    List<Column> columns = getColumns(conn, tableName);
-    String auditTableName = tableName + SUFFIX;
+    List<Column> columns = Jdbc.getColumns(conn, tableName);
+    Audit.checkIllegalColumnNames(columns, ID_A, SYS_VERSION, SYS_DELETED);
+    String auditTableName = Audit.getAuditTableName(tableName);
     CreateTableColumnStep tableStep = dsl.createTable(auditTableName)
         .column(field(ID_A, Integer.class), SQLDataType.INTEGER.nullable(false))
         .column(field(SYS_VERSION, Integer.class), SQLDataType.INTEGER.nullable(false).defaultValue(0))
@@ -82,8 +65,6 @@ public class AuditTableCreator {
     CreateTableConstraintStep constraintStep =
         tableStep.constraint(constraint(PK_PREFIX + auditTableName).primaryKey(ID_A));
     dsl.execute(addPrimaryKeyAutoIncrement(constraintStep.getSQL(ParamType.INLINED)));
-
-    // TODO: 26.03.2018 bigint -> integer, still valid?
 
     //language=SQL
     dsl.execute(sql("CREATE TRIGGER " + tableName + "_AUDIT" +
