@@ -1,17 +1,22 @@
 package eu.kyngas.grapes.common.util;
 
+import eu.kyngas.grapes.common.entity.JsonObj;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Ctx {
+  private static final AtomicBoolean TESTING_MODE = new AtomicBoolean(false);
 
   public static Context ctx() {
     Context context = Vertx.currentContext();
@@ -25,11 +30,11 @@ public class Ctx {
     return ctx().owner();
   }
 
-  public static JsonObject config() {
-    return Ctx.ctx().config();
+  public static JsonObj config() {
+    return JsonObj.from(ctx().config());
   }
 
-  public static JsonObject subConfig(String... subKeys) {
+  public static JsonObj subConfig(String... subKeys) {
     return Config.getSubConfig(config(), subKeys);
   }
 
@@ -37,15 +42,19 @@ public class Ctx {
     N.safe(consumer, c -> c.accept(Vertx.vertx()));
   }
 
-  public static Vertx async(Runnable task) {
-    Context ctx = ctx();
-    ctx.runOnContext(v -> task.run());
-    return ctx.owner();
+  public static void async(Runnable task) {
+    ctx().runOnContext(v -> task.run());
   }
 
-  public static <T> Vertx asyncBlocking(Handler<Future<T>> blockingHandler, Handler<AsyncResult<T>> resultHandler) {
-    Context ctx = ctx();
-    ctx.executeBlocking(blockingHandler, resultHandler);
-    return ctx.owner();
+  public static <T> void blocking(Handler<Future<T>> blockingHandler, Handler<AsyncResult<T>> resultHandler) {
+    ctx().executeBlocking(blockingHandler, resultHandler);
+  }
+
+  public static boolean getTestingMode() {
+    return TESTING_MODE.get();
+  }
+
+  public static void setTestingMode(boolean testingMode) {
+    TESTING_MODE.set(testingMode);
   }
 }

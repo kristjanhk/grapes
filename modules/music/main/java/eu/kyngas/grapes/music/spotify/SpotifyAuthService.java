@@ -31,7 +31,7 @@ import io.vertx.ext.web.RoutingContext;
 public interface SpotifyAuthService extends SpotifyService {
 
   static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).mergeIn(Config.getConfig(SECRET)));
+    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).deepMergeIn(Config.getJson(SECRET)));
   }
 
   SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);

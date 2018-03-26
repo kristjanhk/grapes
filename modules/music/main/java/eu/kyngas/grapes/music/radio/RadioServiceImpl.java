@@ -80,11 +80,11 @@ public class RadioServiceImpl implements RadioService {
     AsyncInputStream in = new AsyncInputStream(new AudioInputStream(line));
     in.endHandler(v -> C.check(clients.isEmpty(), () -> Logs.info("Audio recording input closed."), () -> {
       Logs.error("Audio recording input closed -- disconnecting all clients.");
-      Streams.mapToList(clients.values(), RoutingContext::response).forEach(HttpServerResponse::close);
+      Streams.mapList(clients.values(), RoutingContext::response).forEach(HttpServerResponse::close);
     }));
     in.exceptionHandler(e -> Logs.error("Exception in audio recording.", e));
     in.handler(AudioUtil.encode(encoder, buffer -> Streams
-        .mapToList(clients.values(), RoutingContext::response)
+        .mapList(clients.values(), RoutingContext::response)
         .forEach(res -> C.check(!res.writeQueueFull(),
                                 () -> res.write(buffer),
                                 () -> Logs.debug("Client {}: write queue full", clientId)))));

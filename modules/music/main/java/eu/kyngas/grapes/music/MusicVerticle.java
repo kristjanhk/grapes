@@ -40,6 +40,7 @@ import static eu.kyngas.grapes.common.util.Networks.*;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class MusicVerticle extends Verticle {
+  private static final String MODULE_NAME = "Music";
   private static final Path RESOURCES = Paths.get("modules/music/main/resources");
   private static final String STATIC_PATH = "/static/*";
   private static final String STATIC_FOLDER = "static";
@@ -47,13 +48,13 @@ public class MusicVerticle extends Verticle {
   private HttpServer server;
 
   public static void main(String[] args) {
-    Logs.setLoggingToSLF4J();
+    Logs.init(MODULE_NAME);
     JsonObj config = Config.getGlobal()
-        .deepMergeIn(Config.getConfig("music"))
+        .deepMergeIn(Config.getJson(MODULE_NAME))
         .deepMergeIn(Config.getArgs(args));
     Ctx.create(vertx -> vertx.deployVerticle(new MusicVerticle(),
                                              new DeploymentOptions().setConfig(config),
-                                             ar -> H.handleVerticleStarted(vertx, "Music").handle(ar)));
+                                             ar -> H.handleVerticleStarted(vertx, MODULE_NAME).handle(ar)));
   }
 
   @Override

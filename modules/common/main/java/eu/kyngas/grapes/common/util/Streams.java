@@ -31,15 +31,15 @@ import java.util.stream.Stream;
  */
 public class Streams {
 
-  public static <T, S> List<S> mapToList(Collection<T> items, Function<T, S> mapper) {
+  public static <T, S> List<S> mapList(Collection<T> items, Function<T, S> mapper) {
     return stream(items).map(mapper).collect(Collectors.toList());
   }
 
-  public static <T> List<T> filterToList(Collection<T> items, Predicate<T> filter) {
+  public static <T> List<T> filterList(Collection<T> items, Predicate<T> filter) {
     return stream(items).filter(filter).collect(Collectors.toList());
   }
 
-  public static <T, S> Map<S, T> collectToMap(Collection<T> items, Function<T, S> keyMapper) {
+  public static <T, S> Map<S, T> collectMap(Collection<T> items, Function<T, S> keyMapper) {
     return stream(items).collect(Collectors.toMap(keyMapper, Function.identity()));
   }
 

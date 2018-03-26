@@ -31,6 +31,10 @@ import java.util.stream.Stream;
  */
 public class Strings {
 
+  public static <T> String join(Stream<T> stream, String delimiter) {
+    return stream.map(Object::toString).collect(Collectors.joining(delimiter));
+  }
+
   public static <T> String join(Collection<T> items) {
     return mapToStrings(items).collect(Collectors.joining(", "));
   }

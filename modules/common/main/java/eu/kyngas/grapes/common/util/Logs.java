@@ -36,8 +36,9 @@ public class Logs {
   /**
    * Changes vertx logging to SLF4J.
    */
-  public static void setLoggingToSLF4J() {
+  public static void init(String moduleName) {
     System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
+    info(2, "Starting module {}.", moduleName);
   }
 
   public static void info(String msg, Object... params) {

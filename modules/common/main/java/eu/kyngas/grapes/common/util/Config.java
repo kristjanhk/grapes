@@ -2,10 +2,11 @@ package eu.kyngas.grapes.common.util;
 
 import eu.kyngas.grapes.common.entity.JsonObj;
 import io.vertx.core.json.JsonObject;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
@@ -25,32 +29,16 @@ public class Config {
   private static final String GLOBAL_CONFIG = "/global.json";
   private static final boolean IS_RUNNING_FROM_JAR = getLocation().toString().endsWith(".jar");
 
-  public static JsonObj getConfig(String location, String[] args) {
-    return getConfig(location).mergeIn(getArgs(args));
-  }
-
-  public static JsonObj getConfig(String[] args) {
-    return getConfig(GLOBAL_CONFIG, args);
-  }
-
   public static JsonObj getGlobal() {
-    return getConfig(GLOBAL_CONFIG);
+    return getJson(GLOBAL_CONFIG);
   }
 
-  public static JsonObj getConfig(String location) {
+  public static JsonObj getJson(String location) {
+    String formattedLocation = checkJsonFormat(location);
     try {
-      String formattedLocation = checkFormat(location);
       return getDefaultConfig(formattedLocation).mergeIn(new JsonObj(readToString(formattedLocation)));
     } catch (IOException e) {
-      log.error("Config {} not found.", location);
-    }
-    return new JsonObj();
-  }
-
-  private static JsonObj getDefaultConfig(String location) {
-    try {
-      return new JsonObj(readToString(location.replace(".json", "-default.json")));
-    } catch (IOException ignored) {
+      log.error("Config {} not found.", formattedLocation);
     }
     return new JsonObj();
   }
@@ -66,17 +54,50 @@ public class Config {
     return JsonObj.from(config);
   }
 
-  private static String checkFormat(String location) {
+  public static JsonObj getProperties(String location) {
+    String formattedLocation = checkPropertiesFormat(location);
+    try {
+      return new JsonObj(Stream.of(readToString(formattedLocation).split("\n"))
+                             .filter(line -> !line.startsWith("#") && line.contains("="))
+                             .map(line -> line.split("=", 2))
+                             .filter(s -> s.length == 2)
+                             .collect(Collectors.toMap(s -> s[0], s -> s[1])));
+    } catch (IOException ignored) {
+      log.error("Config {} not found.", formattedLocation);
+    }
+    return new JsonObj();
+  }
+
+  private static JsonObj getDefaultConfig(String location) {
+    try {
+      return new JsonObj(readToString(location.replace(".json", "-default.json")));
+    } catch (IOException ignored) {
+    }
+    return new JsonObj();
+  }
+
+  private static String checkJsonFormat(String location) {
     if (location == null) {
       return GLOBAL_CONFIG;
     }
-    if (location.charAt(0) != '/') {
+    return checkFormat(location, ".json");
+  }
+
+  private static String checkPropertiesFormat(String location) {
+    return checkFormat(location, ".properties");
+  }
+
+  private static String checkFormat(String location, String suffix) {
+    if (!location.startsWith("/")) {
       location = "/" + location;
     }
-    if (!location.endsWith(".json")) {
-      location += ".json";
+    if (!suffix.startsWith(".")) {
+      suffix = "." + suffix;
     }
-    return location;
+    if (!location.endsWith(suffix)) {
+      location += suffix;
+    }
+    return location.toLowerCase(Locale.ENGLISH);
   }
 
   /**
@@ -101,14 +122,9 @@ public class Config {
     if (inputStream == null) {
       throw new FileNotFoundException();
     }
-    ByteArrayOutputStream result = new ByteArrayOutputStream();
-    byte[] buffer = new byte[1024];
-    int length;
-    while ((length = inputStream.read(buffer)) != -1) {
-      result.write(buffer, 0, length);
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+      return Strings.join(reader.lines(), "\n");
     }
-    inputStream.close();
-    return result.toString("UTF-8");
   }
 
   public static List<String> readFile(String absolutePath) {

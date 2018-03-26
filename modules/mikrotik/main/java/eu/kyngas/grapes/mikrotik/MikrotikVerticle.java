@@ -31,16 +31,17 @@ import io.vertx.core.Future;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class MikrotikVerticle extends AbstractVerticle {
+  private static final String MODULE_NAME = "Mikrotik";
   private PingService pingService;
 
   public static void main(String[] args) {
-    Logs.setLoggingToSLF4J();
+    Logs.init(MODULE_NAME);
     JsonObj config = Config.getGlobal()
-        .deepMergeIn(Config.getConfig("mikrotik"))
+        .deepMergeIn(Config.getJson(MODULE_NAME))
         .deepMergeIn(Config.getArgs(args));
     Ctx.create(vertx -> vertx.deployVerticle(new MikrotikVerticle(),
                                              new DeploymentOptions().setConfig(config),
-                                             ar -> H.handleVerticleStarted(vertx, "Mikrotik").handle(ar)));
+                                             ar -> H.handleVerticleStarted(vertx, MODULE_NAME).handle(ar)));
   }
 
   @Override

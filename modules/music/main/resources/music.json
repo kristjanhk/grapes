@@ -12,7 +12,7 @@
   },
   "radio": {
     "mixer": 1,
-    "quality": 2,
-    "bitrate": 256
+    "quality": 1,
+    "bitrate": 192
   }
 }
