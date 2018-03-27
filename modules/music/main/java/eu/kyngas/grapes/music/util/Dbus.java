@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music;
+package eu.kyngas.grapes.music.util;
 
-import eu.kyngas.grapes.common.router.AbstractMainRouter;
-import eu.kyngas.grapes.music.radio.RadioRouter;
-import eu.kyngas.grapes.music.spotify.SpotifyRouter;
+import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class MainRouter extends AbstractMainRouter {
+public class Dbus {
 
-  @Override
-  protected void init() {
-    addCombinedRouter(new SpotifyRouter());
-    addRestRouter(new RadioRouter());
+  public static  Object mapDbus(Object value) {
+    if (value instanceof Vector) {
+      return Arrays.asList(((Vector) value).toArray());
+    }
+    return value;
   }
 }

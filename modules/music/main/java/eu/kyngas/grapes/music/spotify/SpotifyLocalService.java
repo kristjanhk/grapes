@@ -58,16 +58,13 @@ public interface SpotifyLocalService extends SpotifyService {
   SpotifyLocalService togglePlayback(Handler<AsyncResult<Void>> handler);
 
   @Fluent
-  SpotifyLocalService getCurrentSong(Handler<AsyncResult<JsonObject>> handler);
+  SpotifyLocalService getMetadata(Handler<AsyncResult<JsonObject>> handler);
 
   @Fluent
   SpotifyLocalService playTrack(String uri, Handler<AsyncResult<Void>> handler);
 
   @Fluent
   SpotifyLocalService playAlbum(String uri, Handler<AsyncResult<Void>> handler);
-
-  @Fluent
-  SpotifyLocalService seek(long position, Handler<AsyncResult<Void>> handler);
 
   @ProxyClose
   void close();

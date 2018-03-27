@@ -17,10 +17,10 @@
 
 package eu.kyngas.grapes.music.spotify;
 
-import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.router.AbstractRouter;
 import eu.kyngas.grapes.common.router.RestRouter;
 import eu.kyngas.grapes.common.router.SockJsRouter;
+import eu.kyngas.grapes.common.util.Logs;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import java.util.List;
@@ -43,6 +43,10 @@ public class SpotifyRouter extends AbstractRouter implements RestRouter, SockJsR
   public void addRoutes() {
     get("/authorize").handler(ctx -> spotifyAuthService.doAuthorize(handler(ctx, action -> action.redirect(ctx))));
     get("/callback").handler(ctx -> spotifyAuthService.doCallback(ctx, jsonResponse(ctx)));
+    get("/next").handler(ctx -> spotifyLocalService.next(voidResponse(ctx)));
+    get("/previous").handler(ctx -> spotifyLocalService.previous(voidResponse(ctx)));
+    get("/openuri").handler(withParam("uri", (ctx, uri) -> spotifyLocalService.playTrack(uri, voidResponse(ctx))));
+    get("/metadata").handler(ctx -> spotifyLocalService.getMetadata(jsonResponse(ctx)));
   }
 
   @Override

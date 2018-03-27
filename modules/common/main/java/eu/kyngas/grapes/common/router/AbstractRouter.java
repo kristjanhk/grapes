@@ -24,6 +24,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.RouterImpl;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -47,12 +48,31 @@ public abstract class AbstractRouter extends RouterImpl {
         Status.notFound(ctx);
         return;
       }
-      Logs.info("User: {}, path: {}, data: {}", "dummy", ctx.request().path(), ar.result());
+      Logs.info(4, "User: {}, path: {}, response: {}", "dummy", ctx.request().path(), ar.result());
       consumer.accept(ar.result());
     };
   }
 
+  protected Handler<AsyncResult<Void>> voidResponse(RoutingContext ctx) {
+    return handler(ctx, v -> Status.ok(ctx));
+  }
+
+  protected Handler<AsyncResult<Boolean>> booleanResponse(RoutingContext ctx) {
+    return handler(ctx, bool -> Status.ok(ctx, new JsonObject().put("value", bool)));
+  }
+
   protected Handler<AsyncResult<JsonObject>> jsonResponse(RoutingContext ctx) {
-    return handler(ctx, json -> ctx.response().end(json.encodePrettily()));
+    return handler(ctx, json -> Status.ok(ctx, json));
+  }
+
+  protected Handler<RoutingContext> withParam(String name, BiConsumer<RoutingContext, String> ctxParamConsumer) {
+    return ctx -> {
+      String param = ctx.request().getParam(name);
+      if (param == null) {
+        Status.badRequest(ctx, new Throwable(String.format("Missing parameter: %s", name)));
+        return;
+      }
+      ctxParamConsumer.accept(ctx, param);
+    };
   }
 }

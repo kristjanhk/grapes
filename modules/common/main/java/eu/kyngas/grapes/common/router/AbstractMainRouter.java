@@ -34,8 +34,8 @@ import java.util.List;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public abstract class AbstractMainRouter extends RouterImpl {
-  protected final List<RestRouter> restRouters = new ArrayList<>();
-  protected final List<SockJsRouter> sockJsRouters = new ArrayList<>();
+  private final List<RestRouter> restRouters = new ArrayList<>();
+  private final List<SockJsRouter> sockJsRouters = new ArrayList<>();
 
   public AbstractMainRouter() {
     super(Ctx.vertx());
@@ -67,6 +67,19 @@ public abstract class AbstractMainRouter extends RouterImpl {
                                                      permittedToString(outbound)));
     });
     route("/eventbus/*").handler(SockJSHandler.create(Ctx.vertx()).bridge(options, interceptor()));
+  }
+
+  protected void addRestRouter(RestRouter restRouter) {
+    restRouters.add(restRouter);
+  }
+
+  protected void addSockJsRouter(SockJsRouter sockJsRouter) {
+    sockJsRouters.add(sockJsRouter);
+  }
+
+  protected <T extends RestRouter & SockJsRouter> void addCombinedRouter(T combinedRouter) {
+    restRouters.add(combinedRouter);
+    sockJsRouters.add(combinedRouter);
   }
 
   private String permittedToString(List<PermittedOptions> routes) {

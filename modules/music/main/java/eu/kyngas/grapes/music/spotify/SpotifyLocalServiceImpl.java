@@ -17,17 +17,22 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.entity.JsonObj;
+import eu.kyngas.grapes.common.entity.Pair;
 import eu.kyngas.grapes.common.service.ProxyServiceImpl;
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.F;
 import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.util.Networks;
+import eu.kyngas.grapes.common.util.Unsafe;
+import eu.kyngas.grapes.music.util.Dbus;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.freedesktop.DBus;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
@@ -47,75 +52,53 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
   private final String dbusAddress = getDBusAddressFromFile();
   private DBusConnection conn;
   private Player player;
+  private DBus.Properties metadata;
 
   SpotifyLocalServiceImpl() {
     super(ADDRESS, SpotifyLocalService.class);
   }
 
-  private <T> void checkConnection(Handler<AsyncResult<T>> handler, Runnable ifConnected) {
-    if (!Networks.getInstance().isProduction()) {
-      handler.handle(F.fail("Spotify cannot be controlled in a development environment."));
-      return;
-    }
-    if (dbusAddress == null || dbusAddress.isEmpty()) {
-      handler.handle(F.fail("Could not get DBus address."));
-      return;
-    }
-    if (!connect()) {
-      handler.handle(F.fail("Connection to DBus has failed."));
-      return;
-    }
-    if (!getPlayer()) {
-      handler.handle(F.fail("Spotify remote object is invalid."));
-      return;
-    }
-    handler.handle(F.success());
-    ifConnected.run();
-  }
-
   @Override
   public SpotifyLocalService play(Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.Play());
-    return this;
+    return isConnected(handler, () -> player.Play());
   }
 
   @Override
   public SpotifyLocalService pause(Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.Stop());
-    return this;
+    return isConnected(handler, () -> player.Stop());
   }
 
   @Override
   public SpotifyLocalService previous(Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.Previous());
-    return this;
+    return isConnected(handler, () -> player.Previous());
   }
 
   @Override
   public SpotifyLocalService next(Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.Next());
-    return this;
+    return isConnected(handler, () -> player.Next());
   }
 
   @Override
   public SpotifyLocalService togglePlayback(Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.PlayPause());
-    return this;
+    return isConnected(handler, () -> player.PlayPause());
   }
 
   @Override
-  public SpotifyLocalService getCurrentSong(Handler<AsyncResult<JsonObject>> handler) {
-    checkConnection(handler, () -> {
-      Map<String, Variant> metadata = player.Get(DBUS_SERVICE_PLAYER, "Metadata");
-      metadata.forEach((key, value) -> Logs.info("Metadata -> Key: {}, Value: {}", key, value));
+  public SpotifyLocalService getMetadata(Handler<AsyncResult<JsonObject>> handler) {
+    return connected(handler, () -> {
+      Map<String, Variant> data = Unsafe.cast(metadata.GetAll(DBUS_SERVICE_PLAYER).get("Metadata").getValue());
+      Map<String, Object> map = data.entrySet().stream()
+          .map(e -> Pair.of(e.getKey().replaceFirst("mpris:|xesam:", ""),
+                            Dbus.mapDbus(e.getValue().getValue())))
+          .collect(Collectors.toMap(Pair::getFst, Pair::getSnd));
+      handler.handle(F.success(new JsonObj(map)));
     });
-    return this;
   }
 
   @Override
   public SpotifyLocalService playTrack(String uri, Handler<AsyncResult<Void>> handler) {
     C.check(uri.startsWith("spotify:track:"),
-            () -> checkConnection(handler, () -> player.OpenUri(uri)),
+            () -> isConnected(handler, () -> player.OpenUri(uri)),
             () -> handler.handle(F.fail("Uri does not start with 'spotify:track:'.")));
     return this;
   }
@@ -123,14 +106,8 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
   @Override
   public SpotifyLocalService playAlbum(String uri, Handler<AsyncResult<Void>> handler) {
     C.check(uri.startsWith("spotify:album:"),
-            () -> checkConnection(handler, () -> player.OpenUri(uri)),
+            () -> isConnected(handler, () -> player.OpenUri(uri)),
             () -> handler.handle(F.fail("Uri does not start with 'spotify:album:'.")));
-    return this;
-  }
-
-  @Override
-  public SpotifyLocalService seek(long position, Handler<AsyncResult<Void>> handler) {
-    checkConnection(handler, () -> player.Seek(position));
     return this;
   }
 
@@ -153,8 +130,6 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
     void Next();
 
     void OpenUri(String Uri);
-
-    void Seek(long Offset);
   }
 
   private String getDBusAddressFromFile() {
@@ -177,6 +152,7 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
 
   private void disconnect() {
     player = null;
+    metadata = null;
     if (conn != null) {
       conn.disconnect();
       conn = null;
@@ -184,15 +160,47 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
   }
 
   private boolean getPlayer() {
-    if (player != null) {
+    if (player != null && metadata != null) {
       return true;
     }
     try {
       player = conn.getRemoteObject(DBUS_SERVICE_SPOTIFY, DBUS_MPRIS_PLAYER, Player.class);
+      metadata = conn.getRemoteObject(DBUS_SERVICE_SPOTIFY, DBUS_MPRIS_PLAYER, DBus.Properties.class);
       return true;
     } catch (DBusException e) {
       Logs.error("Failed to get Spotify DBus object.", e);
     }
     return false;
+  }
+
+  private <T> void checkConnection(Handler<AsyncResult<T>> handler, boolean succeedFast, Runnable ifConnected) {
+    if (!Networks.getInstance().isProduction()) {
+      handler.handle(F.fail("Spotify cannot be controlled in a development environment."));
+      return;
+    }
+    if (dbusAddress == null || dbusAddress.isEmpty()) {
+      handler.handle(F.fail("Could not get DBus address."));
+      return;
+    }
+    if (!connect()) {
+      handler.handle(F.fail("Connection to DBus has failed."));
+      return;
+    }
+    if (!getPlayer()) {
+      handler.handle(F.fail("Spotify remote object is invalid."));
+      return;
+    }
+    C.ifTrue(succeedFast, () -> handler.handle(F.success()));
+    ifConnected.run();
+  }
+
+  private <T> SpotifyLocalService connected(Handler<AsyncResult<T>> handler, Runnable isConnected) {
+    checkConnection(handler, false, isConnected);
+    return this;
+  }
+
+  private <T> SpotifyLocalService isConnected(Handler<AsyncResult<T>> handler, Runnable isConnected) {
+    checkConnection(handler, true, isConnected);
+    return this;
   }
 }
