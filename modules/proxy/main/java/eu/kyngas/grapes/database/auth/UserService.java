@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.music.spotify;
+package eu.kyngas.grapes.database.auth;
 
-import eu.kyngas.grapes.common.service.ProxyService;
-import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.proxy.ProxyService;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.ProxyClose;
 import io.vertx.codegen.annotations.ProxyGen;
@@ -26,25 +25,25 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import java.util.List;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 @VertxGen
 @ProxyGen
-public interface SpotifyMusicService extends SpotifyService {
-  String ADDRESS = "music.spotify.music";
+public interface UserService {
+  String ADDRESS = "database.auth.user";
 
-  static SpotifyMusicService create() {
-    return new SpotifyMusicServiceImpl(Ctx.subConfig(SPOTIFY));
-  }
-
-  static SpotifyMusicService createProxy() {
-    return ProxyService.createProxy(ADDRESS, SpotifyMusicService.class);
+  static UserService createProxy() {
+    return ProxyService.createProxy(ADDRESS, UserService.class);
   }
 
   @Fluent
-  SpotifyMusicService getTestData(Handler<AsyncResult<JsonObject>> handler);
+  UserService findAllUsers(Handler<AsyncResult<List<JsonObject>>> handler);
+
+  @Fluent
+  UserService findUsersByName(String name, Handler<AsyncResult<List<JsonObject>>> handler);
 
   @ProxyClose
   void close();

@@ -30,9 +30,9 @@ import static io.vertx.ext.bridge.BridgeEventType.RECEIVE;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class SpotifyRouter extends AbstractRouter implements RestRouter, SockJsRouter {
-  private final SpotifyAuthService spotifyAuthService = SpotifyAuthService.create();
-  private final SpotifyMusicService spotifyMusicService = SpotifyMusicService.create();
-  private final SpotifyLocalService spotifyLocalService = SpotifyLocalService.create();
+  private final SpotifyAuthService spotifyAuthService = SpotifyService.createAuthService();
+  private final SpotifyMusicService spotifyMusicService = SpotifyService.createMusicService();
+  private final SpotifyLocalService spotifyLocalService = SpotifyService.createLocalService();
 
   @Override
   public String getPath() {

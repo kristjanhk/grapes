@@ -17,7 +17,7 @@
 
 package eu.kyngas.grapes.music.spotify;
 
-import eu.kyngas.grapes.common.service.ProxyServiceImpl;
+import eu.kyngas.grapes.proxy.ProxyServiceImpl;
 import eu.kyngas.grapes.common.util.Ctx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;

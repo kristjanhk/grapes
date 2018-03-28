@@ -17,7 +17,7 @@
 
 package eu.kyngas.grapes.music.spotify;
 
-import eu.kyngas.grapes.common.service.ProxyService;
+import eu.kyngas.grapes.proxy.ProxyService;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.ProxyClose;
 import io.vertx.codegen.annotations.ProxyGen;
@@ -31,12 +31,8 @@ import io.vertx.core.json.JsonObject;
  */
 @VertxGen
 @ProxyGen
-public interface SpotifyLocalService extends SpotifyService {
+public interface SpotifyLocalService {
   String ADDRESS = "music.spotify.local";
-
-  static SpotifyLocalService create() {
-    return new SpotifyLocalServiceImpl();
-  }
 
   static SpotifyLocalService createProxy() {
     return ProxyService.createProxy(ADDRESS, SpotifyLocalService.class);

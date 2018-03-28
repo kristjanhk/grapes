@@ -38,6 +38,12 @@ subprojects {
   }
 
   dependencies {
+    if (project.name != 'common') {
+      compile project(':common')
+      if (project.name != 'proxy') {
+        compile project(':proxy')
+      }
+    }
     compile group: 'ch.qos.logback', name: 'logback-classic', version: ver.logback
     compile group: 'io.vertx', name: 'vertx-core', version: ver.vertx
     compile group: 'io.vertx', name: 'vertx-service-discovery', version: ver.vertx

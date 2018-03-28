@@ -2,6 +2,7 @@ rootProject.name = 'grapes'
 
 //modules
 include ':common'
+include ':proxy'
 include ':music'
 include ':deploy'
 include ':gateway'
@@ -10,6 +11,7 @@ include ':database'
 
 //module paths
 project(':common').projectDir = "$rootDir/modules/common" as File
+project(':proxy').projectDir = "$rootDir/modules/proxy" as File
 project(':music').projectDir = "$rootDir/modules/music" as File
 project(':deploy').projectDir = "$rootDir/modules/deploy" as File
 project(':gateway').projectDir = "$rootDir/modules/gateway" as File

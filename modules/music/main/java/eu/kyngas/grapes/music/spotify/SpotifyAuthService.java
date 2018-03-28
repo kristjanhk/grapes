@@ -18,8 +18,6 @@
 package eu.kyngas.grapes.music.spotify;
 
 import eu.kyngas.grapes.common.router.RedirectAction;
-import eu.kyngas.grapes.common.util.Config;
-import eu.kyngas.grapes.common.util.Ctx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -28,11 +26,7 @@ import io.vertx.ext.web.RoutingContext;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface SpotifyAuthService extends SpotifyService {
-
-  static SpotifyAuthService create() {
-    return new SpotifyAuthServiceImpl(Ctx.subConfig(SPOTIFY, AUTH).deepMergeIn(Config.getJson(SECRET)));
-  }
+public interface SpotifyAuthService {
 
   SpotifyAuthService doAuthorize(Handler<AsyncResult<RedirectAction>> handler);
 

@@ -17,38 +17,12 @@
 
 package eu.kyngas.grapes.database.auth;
 
-import eu.kyngas.grapes.common.service.ProxyService;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.ProxyClose;
-import io.vertx.codegen.annotations.ProxyGen;
-import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import java.util.List;
-
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-@VertxGen
-@ProxyGen
-public interface UserService {
-  String ADDRESS = "database.auth.user";
+public interface AuthService {
 
-  static UserService create() {
+  static UserService createUserService() {
     return new UserServiceImpl(null);
   }
-
-  static UserService createProxy() {
-    return ProxyService.createProxy(ADDRESS, UserService.class);
-  }
-
-  @Fluent
-  UserService findAllUsers(Handler<AsyncResult<List<JsonObject>>> handler);
-
-  @Fluent
-  UserService findUsersByName(String name, Handler<AsyncResult<List<JsonObject>>> handler);
-
-  @ProxyClose
-  void close();
 }

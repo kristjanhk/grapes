@@ -21,8 +21,6 @@ loadProperties(project, false, 'databaseProps', "$projectDir/${dir.main_resource
 loadProperties(project, false, 'databaseSecretProps', "$projectDir/${dir.main_resources}/database-secret.properties")
 
 dependencies {
-  compile project(':common')
-
   compile group: 'io.vertx', name: 'vertx-web', version: ver.vertx
   compile group: 'com.h2database', name: 'h2', version: ver.h2
   compile group: 'org.flywaydb', name: 'flyway-core', version: ver.flyway

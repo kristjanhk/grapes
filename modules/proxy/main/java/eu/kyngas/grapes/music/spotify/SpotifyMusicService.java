@@ -15,21 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.common.service;
+package eu.kyngas.grapes.music.spotify;
 
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.codegen.annotations.ProxyIgnore;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
+import eu.kyngas.grapes.proxy.ProxyService;
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.ProxyClose;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface ProxyService {
+@VertxGen
+@ProxyGen
+public interface SpotifyMusicService {
+  String ADDRESS = "music.spotify.music";
 
-  @ProxyIgnore
-  static <T> T createProxy(String address, Class<T> serviceClass) {
-    return new ServiceProxyBuilder(Ctx.vertx()).setAddress(address).build(serviceClass);
+  static SpotifyMusicService createProxy() {
+    return ProxyService.createProxy(ADDRESS, SpotifyMusicService.class);
   }
 
+  @Fluent
+  SpotifyMusicService getTestData(Handler<AsyncResult<JsonObject>> handler);
+
+  @ProxyClose
   void close();
 }
