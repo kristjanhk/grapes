@@ -15,17 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gateway;
+package eu.kyngas.grapes.gateway;
 
-import io.vertx.core.AbstractVerticle;
+import eu.kyngas.grapes.common.router.AbstractMainRouter;
+import eu.kyngas.grapes.common.router.Status;
+import eu.kyngas.grapes.common.util.Ctx;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class GatewayVerticle extends AbstractVerticle {
+public class MainRouter extends AbstractMainRouter {
 
   @Override
-  public void start() throws Exception {
-
+  protected void init() {
+    get("/kill").handler(ctx -> {
+      Ctx.vertx().close();
+      Status.ok(ctx);
+    });
   }
 }

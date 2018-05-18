@@ -1,0 +1,11 @@
+{
+  "uri": "acme://letsencrypt.org/staging",
+  "domains": {
+    "kyngas.eu": [
+      "kyngas.eu"
+    ]
+  },
+  "use-http-challenge": false,
+  "use-dns-challenge": true,
+  "use-tls-alpn-challenge": false
+}

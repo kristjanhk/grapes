@@ -41,4 +41,12 @@ shadowJar {
   classifier = 'gateway'
 }
 
-processResources.dependsOn productionBundle
+//todo production bundle needs to run after depending project
+
+//processResources.dependsOn productionBundle
+
+dependencies {
+  compile group: 'io.vertx', name: 'vertx-web', version: ver.vertx
+  compile group: 'org.shredzone.acme4j', name: 'acme4j-client', version: ver.acme
+  compile 'org.shredzone.acme4j:acme4j-utils:2.0' //todo rm if can be used without
+}
