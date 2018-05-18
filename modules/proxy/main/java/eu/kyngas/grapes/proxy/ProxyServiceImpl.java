@@ -26,11 +26,11 @@ import io.vertx.serviceproxy.ServiceBinder;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public abstract class ProxyServiceImpl<T> implements ProxyService {
+public abstract class ProxyServiceImpl implements ProxyService {
   protected final ServiceBinder serviceBinder;
   protected final MessageConsumer<JsonObject> messageConsumer;
 
-  protected ProxyServiceImpl(String address, Class<T> serviceClass) {
+  protected <T> ProxyServiceImpl(String address, Class<T> serviceClass) {
     this.serviceBinder = new ServiceBinder(Ctx.vertx());
     this.messageConsumer = this.serviceBinder.setAddress(address).register(serviceClass, Unsafe.cast(this));
   }

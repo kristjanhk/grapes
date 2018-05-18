@@ -15,23 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.proxy;
+@ModuleGen(name = "http", groupPackage = "eu.kyngas.grapes.gateway.http")
+package eu.kyngas.grapes.gateway.http;
 
-import eu.kyngas.grapes.common.util.Ctx;
-import io.vertx.codegen.annotations.ProxyClose;
-import io.vertx.codegen.annotations.ProxyIgnore;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
-
-/**
- * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
- */
-public interface ProxyService {
-
-  @ProxyIgnore
-  static <T> T createProxy(String address, Class<T> serviceClass) {
-    return new ServiceProxyBuilder(Ctx.vertx()).setAddress(address).build(serviceClass);
-  }
-
-  @ProxyClose
-  void close();
-}
+import io.vertx.codegen.annotations.ModuleGen;

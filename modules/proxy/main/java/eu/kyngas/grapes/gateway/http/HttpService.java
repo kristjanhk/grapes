@@ -15,22 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.kyngas.grapes.proxy;
+package eu.kyngas.grapes.gateway.http;
 
-import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.proxy.ProxyService;
+import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.ProxyClose;
-import io.vertx.codegen.annotations.ProxyIgnore;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public interface ProxyService {
+@VertxGen
+@ProxyGen
+public interface HttpService {
+  String ADDRESS = "gateway.http.server";
 
-  @ProxyIgnore
-  static <T> T createProxy(String address, Class<T> serviceClass) {
-    return new ServiceProxyBuilder(Ctx.vertx()).setAddress(address).build(serviceClass);
+  static HttpService createProxy() {
+    return ProxyService.createProxy(ADDRESS, HttpService.class);
   }
+
+  @Fluent
+  HttpService addRoute(String url, String response);
+
+  @Fluent
+  HttpService removeRoute(String url);
+
+  @Fluent
+  HttpService reloadCertificate();
 
   @ProxyClose
   void close();
