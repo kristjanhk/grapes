@@ -37,6 +37,10 @@ subprojects {
     destinationDir = file("$rootDir/output")
   }
 
+  configurations {
+    ajc
+  }
+
   dependencies {
     if (project.name != 'common') {
       compile project(':common')
@@ -44,10 +48,16 @@ subprojects {
         compile project(':proxy')
       }
     }
+
+    compile group: 'org.aspectj', name: 'aspectjrt', version: ver.aspectj
+    compileOnly group: 'org.aspectj', name: 'aspectjweaver', version: ver.aspectj
+    ajc group: 'org.aspectj', name: 'aspectjtools', version: ver.aspectj
+
     compile group: 'ch.qos.logback', name: 'logback-classic', version: ver.logback
     compile group: 'io.vertx', name: 'vertx-core', version: ver.vertx
     compile group: 'io.vertx', name: 'vertx-service-discovery', version: ver.vertx
     compile group: 'io.vertx', name: 'vertx-service-proxy', version: ver.vertx
+    compile group: 'io.vertx', name: 'vertx-hazelcast', version: ver.vertx
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: ver.lombok
     compileOnly group: 'io.vertx', name: 'vertx-codegen', version: ver.vertx
@@ -97,13 +107,44 @@ subprojects {
     ]
   }
 
+  def compileAspects = {
+    ant.taskdef(resource: "org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties",
+                classpath: configurations.ajc.asPath)
+    def classPath = project.sourceSets.main.runtimeClasspath
+        .filter{File file -> !file.path.contains('\\build\\resources\\main')}
+        .asPath
+    def outputClassesPath = project.sourceSets.main.output.classesDir.absolutePath
+    String vertxCorePath = configurations.compile
+        .filter { File file -> file.name == "vertx-core-${ver.vertx}.jar" }
+        .singleFile
+        .absolutePath
+    ant.iajc(maxmem: "1024m",
+             fork: "true",
+             Xlint: "ignore",
+             destDir: outputClassesPath,
+             aspectPath: rootProject.project(":common").sourceSets.main.output.classesDir.absolutePath,
+             classpath: classPath,
+             source: project.sourceCompatibility,
+             target: project.targetCompatibility) {
+      //todo copy .aj files to output before?
+      inPath {
+        [outputClassesPath, vertxCorePath].each { dir ->
+          pathelement(location: dir)
+        }
+      }
+    }
+  }
+
   compileJava {
     options.encoding = 'UTF-8'
     dependsOn proxyGen
+    doLast {
+      compileAspects()
+    }
   }
 
   task proxyClean(type: Delete) {
-    delete "${dir.main_gen}"
+    delete dir.main_gen
   }
   clean.dependsOn proxyClean
 
@@ -133,7 +174,7 @@ subprojects {
 task wrapper(type: Wrapper) {
   gradleVersion = ver.gradle as String
   //noinspection UnnecessaryQualifiedReference
-  distributionType = Wrapper.DistributionType.ALL
+  distributionType = Wrapper.DistributionType.BIN
 }
 
 private static List<String> getDebugOptions() {
