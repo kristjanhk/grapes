@@ -91,7 +91,7 @@ public class RouterServiceImpl implements RouterService {
     }
   }
 
-  private boolean handleApiCall(Callback callback, Handler<AsyncResult<Void>> handler) {
+  private boolean handleApiCall(Callback.Paramless callback, Handler<AsyncResult<Void>> handler) {
     try {
       callback.exec();
       return true;
