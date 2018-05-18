@@ -21,7 +21,10 @@
       </extension>
     </inspection_tool>
     <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MissingAspectjAutoproxyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SetReplaceableByEnumSet" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SpringAopErrorsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="SpringAopWarningsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="TsLint" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">

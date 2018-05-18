@@ -26,6 +26,11 @@ public class N {
     return obj;
   }
 
+  @SafeVarargs
+  public static <T> T coalesce(T... in) {
+    return Arrays.stream(in).filter(Objects::nonNull).findFirst().orElse(null);
+  }
+
   public static <T> T ifExists(T in, Supplier<T> ifExists) {
     return in != null ? ifExists.get() : null;
   }
@@ -40,5 +45,11 @@ public class N {
 
   public static boolean noneNull(Object... objs) {
     return Arrays.stream(objs).noneMatch(Objects::isNull);
+  }
+
+  public static void require(Object in, String errorMsg) {
+    if (in == null) {
+      throw new NullPointerException(errorMsg);
+    }
   }
 }

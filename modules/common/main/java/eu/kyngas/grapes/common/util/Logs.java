@@ -57,6 +57,14 @@ public class Logs {
     LOGGER.callAppenders(createLoggingEvent(Level.DEBUG, skip, msg, params));
   }
 
+  public static void warn(String msg, Object... params) {
+    LOGGER.callAppenders(createLoggingEvent(Level.WARN, 1, msg, params));
+  }
+
+  public static void warn(int skip, String msg, Object... params) {
+    LOGGER.callAppenders(createLoggingEvent(Level.WARN, skip, msg, params));
+  }
+
   public static void error(String msg, Object... params) {
     LOGGER.callAppenders(createLoggingEvent(Level.ERROR, 1, msg, params));
   }
@@ -70,27 +78,26 @@ public class Logs {
       skip = 1;
     }
     FormattingTuple tuple = MessageFormatter.arrayFormat(msg, params);
-    boolean hasEx = tuple.getThrowable() != null;
+    boolean hasException = tuple.getThrowable() != null;
 
     String message = tuple.getMessage() != null
         ? tuple.getMessage()
-        : hasEx
+        : hasException
             ? tuple.getThrowable().getMessage()
             : "Unknown cause";
 
-    Throwable def = new Throwable("Unknown cause");
-    Throwable throwable = hasEx ? tuple.getThrowable() : def;
+    Throwable defaultThrowable = new Throwable("Unknown cause");
+    Throwable throwable = hasException ? tuple.getThrowable() : defaultThrowable;
     throwable.setStackTrace(Arrays.stream(throwable.getStackTrace())
-                                .skip(hasEx ? 0 : skip + 1)
+                                .skip(hasException ? 0 : skip + 1)
                                 .limit(8)
                                 .toArray(StackTraceElement[]::new));
+    boolean showStack = Eq.ne(throwable, defaultThrowable) && Eq.eq(level, Level.ERROR, Level.DEBUG);
     LoggingEvent loggingEvent = new LoggingEvent(Logger.FQCN,
                                                  LOGGER,
                                                  level,
                                                  message,
-                                                 Eq.ne(throwable, def) && Eq.eq(level, Level.ERROR, Level.DEBUG)
-                                                     ? throwable
-                                                     : null,
+                                                 showStack ? throwable : null,
                                                  null);
     loggingEvent.setCallerData(throwable.getStackTrace());
     return loggingEvent;

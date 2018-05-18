@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AjcSettings">
+    <option name="ajcPath" value="$PROJECT_DIR$/buildSrc/lib/aspectjtools.jar" />
+    <option name="aptOptionsEnabled" value="true" />
+  </component>
   <component name="CompilerConfiguration">
+    <option name="BUILD_PROCESS_HEAP_SIZE" value="1000" />
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="buildSrc_main" target="1.8" />
+      <module name="buildSrc_test" target="1.8" />
       <module name="common_main" target="1.8" />
       <module name="common_test" target="1.8" />
-      <module name="core_main" target="1.8" />
-      <module name="core_test" target="1.8" />
+      <module name="database_main" target="1.8" />
+      <module name="database_test" target="1.8" />
       <module name="deploy_main" target="1.8" />
       <module name="deploy_test" target="1.8" />
+      <module name="gateway_main" target="1.8" />
+      <module name="gateway_test" target="1.8" />
       <module name="mikrotik_main" target="1.8" />
       <module name="mikrotik_test" target="1.8" />
       <module name="music_main" target="1.8" />
       <module name="music_test" target="1.8" />
+      <module name="proxy_main" target="1.8" />
+      <module name="proxy_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

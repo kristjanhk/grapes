@@ -123,7 +123,7 @@ public class Config {
       throw new FileNotFoundException();
     }
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-      return Strings.join(reader.lines(), "\n");
+      return S.join(reader.lines(), "\n");
     }
   }
 

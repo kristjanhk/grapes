@@ -40,6 +40,7 @@ public final class Status {
   public static final int PRECONDITION_FAILED = 412;
   public static final int IM_A_TEAPOT = 418;
   public static final int RATE_LIMIT = 429;
+  public static final int INVALID_INPUT = 422;
   public static final int INTERNAL_SERVER_ERROR = 500;
   public static final int NOT_IMPLEMENTED = 501;
   public static final int BAD_GATEWAY = 501;
@@ -47,6 +48,7 @@ public final class Status {
 
   public static final String CONTENT_TYPE = "content-type";
   public static final String JSON = "application/json";
+  public static final String TEXT = "text/plain";
 
   public static void ok(RoutingContext ctx) {
     ctx.response()
@@ -59,6 +61,13 @@ public final class Status {
        .setStatusCode(OK)
        .putHeader(CONTENT_TYPE, JSON)
        .end(json.encodePrettily());
+  }
+
+  public static void ok(RoutingContext ctx, String content) {
+    ctx.response()
+        .setStatusCode(OK)
+        .putHeader(CONTENT_TYPE, TEXT)
+        .end(content);
   }
 
   public static void badRequest(RoutingContext ctx, Throwable ex) {

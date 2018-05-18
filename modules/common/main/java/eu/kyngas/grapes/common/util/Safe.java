@@ -17,16 +17,14 @@
 
 package eu.kyngas.grapes.common.util;
 
-import static eu.kyngas.grapes.common.util.Unsafe.cast;
-
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class Safe {
 
-  public static <T> T safeCast(Object in) {
+  public static <T> T cast(Object in) {
     try {
-      return cast(in);
+      return Unsafe.cast(in);
     } catch (ClassCastException ignored) {
       return null;
     }

@@ -22,5 +22,27 @@ package eu.kyngas.grapes.common.entity;
  */
 public interface Callback {
 
-  void exec() throws Exception;
+  interface Paramless {
+    void exec() throws Exception;
+  }
+
+  interface Param<T> {
+    void exec(T in) throws Exception;
+  }
+
+  interface BiParam<T, S> {
+    void exec(T in1, S in2) throws Exception;
+  }
+
+  interface Returning<T> {
+    T exec() throws Exception;
+  }
+
+  interface ReturningParam<T, S> {
+    T exec(S in) throws Exception;
+  }
+
+  interface ReturningBiParam<T, S, V> {
+    T exec(S in1, V in2) throws Exception;
+  }
 }

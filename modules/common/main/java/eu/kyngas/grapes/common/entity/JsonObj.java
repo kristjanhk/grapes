@@ -18,7 +18,8 @@
 package eu.kyngas.grapes.common.entity;
 
 import eu.kyngas.grapes.common.util.N;
-import eu.kyngas.grapes.common.util.Strings;
+import eu.kyngas.grapes.common.util.S;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -66,18 +67,30 @@ public class JsonObj extends JsonObject {
     return parent == null ? null : new JsonObj(parent.getMap());
   }
 
+  public static JsonObj from(Buffer buffer) {
+    return buffer == null ? null : from(buffer.toJsonObject());
+  }
+
   public static JsonObj from(Object parent) {
-    return parent == null || !(parent instanceof JsonObject) ? null : new JsonObj(((JsonObject) parent).getMap());
+    return !(parent instanceof JsonObject) ? null : new JsonObj(((JsonObject) parent).getMap());
   }
 
   public static JsonObj toCamelCase(JsonObject json) {
-    return new JsonObj(json.getMap().entrySet().stream()
-                           .collect(Collectors.toMap(e -> Strings.toCamelCase(e.getKey()), Map.Entry::getValue)));
+    return json == null
+        ? new JsonObj()
+        : new JsonObj(json.getMap().entrySet().stream()
+                          .collect(Collectors.toMap(e -> S.toCamelCase(e.getKey()), Map.Entry::getValue)));
   }
 
   public static JsonObj toSnakeCase(JsonObject json) {
-    return new JsonObj(json.getMap().entrySet().stream()
-                           .collect(Collectors.toMap(e -> Strings.toSnakeCase(e.getKey()), Map.Entry::getValue)));
+    return json == null
+        ? new JsonObj()
+        : new JsonObj(json.getMap().entrySet().stream()
+                          .collect(Collectors.toMap(e -> S.toSnakeCase(e.getKey()), Map.Entry::getValue)));
+  }
+
+  public static <T> T mapTo(JsonObject json, Class<T> clazz) {
+    return toCamelCase(json).mapTo(clazz);
   }
 
   public static JsonObj wrap(Consumer<JsonObj> consumer) {

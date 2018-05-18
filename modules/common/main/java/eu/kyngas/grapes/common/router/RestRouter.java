@@ -18,7 +18,7 @@
 package eu.kyngas.grapes.common.router;
 
 import eu.kyngas.grapes.common.util.Logs;
-import eu.kyngas.grapes.common.util.Strings;
+import eu.kyngas.grapes.common.util.S;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 
@@ -35,7 +35,7 @@ public interface RestRouter extends Router {
     parent.mountSubRouter(path, this);
     addRoutes();
     Logs.debug("{} registered routes under {}: {}",
-               getClass().getSimpleName(), path, Strings.join(getRoutes(), Route::getPath));
+               getClass().getSimpleName(), path, S.join(getRoutes(), Route::getPath));
   }
 
   default void close() {

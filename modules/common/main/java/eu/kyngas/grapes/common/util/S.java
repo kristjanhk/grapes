@@ -17,6 +17,7 @@
 
 package eu.kyngas.grapes.common.util;
 
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
@@ -25,11 +26,17 @@ import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class Strings {
+public class S {
+
+  public static String format(String format, Object... args) {
+    return String.format(format, args);
+  }
 
   public static <T> String join(Stream<T> stream, String delimiter) {
     return stream.map(Object::toString).collect(Collectors.joining(delimiter));
@@ -82,5 +89,47 @@ public class Strings {
 
   public static String base64(String format, Object... params) {
     return base64(String.format(format, params));
+  }
+
+  public static String toString(Object obj) {
+    return ReflectionToStringBuilder.reflectionToString(obj, ToStringStyle.SHORT_PREFIX_STYLE);
+  }
+
+  private static String toFieldsString(Object obj) {
+    return toFieldsString(obj, 0);
+  }
+
+  private static String toFieldsString(Object obj, int depth) {
+    if (obj == null) {
+      return "null";
+    }
+    if (obj instanceof String) {
+      return "\"" + obj.toString() + "\"";
+    }
+    if (obj.getClass().isPrimitive() || depth < 0) { // TODO: 19.05.2018 is wrapped primitive
+      return obj.toString();
+    }
+    String name = obj.getClass().getSimpleName();
+    StringBuilder sb = new StringBuilder();
+
+    if (obj.getClass().isArray()) {
+      Arrays.stream((Object[]) obj).forEach(o -> sb.append(toFieldsString(o, depth - 1)));
+      return "[" + sb.toString() + "]";
+    }
+    if (obj instanceof Iterable) {
+      Unsafe.<Iterable<Object>>cast(obj).forEach(o -> sb.append(toFieldsString(o, depth - 1)));
+      return "[" + sb.toString() + "]";
+    }
+
+    try {
+      Field[] fields = obj.getClass().getDeclaredFields();
+      for (Field field : fields) {
+        field.setAccessible(true);
+        sb.append(field.getName()).append("=").append(toFieldsString(field.get(obj), depth - 1)).append(";");
+      }
+      return name + "[" + (sb.length() > 0 ? sb.substring(0, sb.length() - 1) : "") + "]";
+    } catch (IllegalAccessException e) {
+      return "IllegalAccess";
+    }
   }
 }

@@ -19,26 +19,26 @@ package eu.kyngas.grapes.common.router;
 
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Ctx;
+import eu.kyngas.grapes.common.util.Eq;
 import eu.kyngas.grapes.common.util.Logs;
-import eu.kyngas.grapes.common.util.Strings;
+import eu.kyngas.grapes.common.util.Streams;
+import eu.kyngas.grapes.common.util.S;
 import io.vertx.core.Handler;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import io.vertx.ext.web.impl.RouterImpl;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public abstract class AbstractMainRouter extends RouterImpl {
+public abstract class AbstractMainRouter extends AbstractRouter {
   private final List<RestRouter> restRouters = new ArrayList<>();
   private final List<SockJsRouter> sockJsRouters = new ArrayList<>();
 
   public AbstractMainRouter() {
-    super(Ctx.vertx());
     init();
     initRoutes();
     initSockjsRoutes();
@@ -83,7 +83,7 @@ public abstract class AbstractMainRouter extends RouterImpl {
   }
 
   private String permittedToString(List<PermittedOptions> routes) {
-    return Strings.join(routes, route -> route.getAddress() != null ? route.getAddress() : route.getAddressRegex());
+    return S.join(routes, route -> route.getAddress() != null ? route.getAddress() : route.getAddressRegex());
   }
 
   private Handler<BridgeEvent> interceptor() {
@@ -93,6 +93,16 @@ public abstract class AbstractMainRouter extends RouterImpl {
           .anyMatch(router -> event.isComplete());
       C.ifFalse(completed, () -> event.complete(true));
     };
+  }
+
+  @Override
+  protected boolean hasRoute(String url) {
+    RestRouter assignedRouter = Streams.findFirst(restRouters, router -> Eq.eq(router.getPath(), url));
+    if (assignedRouter != null) {
+      Logs.error("RestRouter {} has already been assigned url {}.", assignedRouter.getClass().getSimpleName(), url);
+      return true;
+    }
+    return super.hasRoute(url);
   }
 
   public void close() {

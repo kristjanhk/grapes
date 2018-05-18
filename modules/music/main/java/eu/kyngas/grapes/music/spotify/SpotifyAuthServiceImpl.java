@@ -17,26 +17,26 @@
 
 package eu.kyngas.grapes.music.spotify;
 
+import eu.kyngas.grapes.common.entity.JsonObj;
 import eu.kyngas.grapes.common.entity.Pair;
 import eu.kyngas.grapes.common.router.RedirectAction;
 import eu.kyngas.grapes.common.router.Status;
-import eu.kyngas.grapes.common.service.HttpService;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.F;
 import eu.kyngas.grapes.common.util.H;
-import eu.kyngas.grapes.common.util.Http;
 import eu.kyngas.grapes.common.util.Logs;
 import eu.kyngas.grapes.common.util.Networks;
-import eu.kyngas.grapes.common.util.Strings;
+import eu.kyngas.grapes.common.util.S;
+import eu.kyngas.grapes.common.util.Unsafe;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.impl.HttpClientImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import java.util.HashMap;
@@ -47,11 +47,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import static eu.kyngas.grapes.common.util.Http.*;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
+public class SpotifyAuthServiceImpl implements SpotifyAuthService {
   private static final String CLIENT_ID = "client_id";
   private static final String CLIENT_SECRET = "client_secret";
   private static final String REDIRECT_URI = "redirect_uri";
@@ -65,7 +66,6 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
   private final String clientId;
   private final String clientSecret;
   private final String redirectUri;
-  private final HttpClientOptions options;
   private final HttpClient client;
 
   private Set<String> csrfTokens = new HashSet<>();
@@ -75,11 +75,7 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
     this.clientId = config.getString(CLIENT_ID, "");
     this.clientSecret = config.getString(CLIENT_SECRET, "");
     this.redirectUri = config.getString(REDIRECT_URI, "");
-    this.options = new HttpClientOptions()
-        .setDefaultHost(config.getString(HOST, "accounts.spotify.com"))
-        .setDefaultPort(config.getInteger(PORT, 443))
-        .setSsl(config.getBoolean(SSL, true));
-    this.client = vertx.createHttpClient(options);
+    this.client = createClient(config);
   }
 
   @Override
@@ -97,12 +93,12 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
     }
     String uuid = UUID.randomUUID().toString();
     csrfTokens.add(uuid);
-    handler.handle(Future.succeededFuture(Http.Query.of("/authorize")
+    handler.handle(Future.succeededFuture(Query.of("/authorize")
                                               .param(CLIENT_ID, clientId)
                                               .param("response_type", CODE)
                                               .param(REDIRECT_URI, getRedirectUri())
                                               .param(STATE, uuid)
-                                              .toRedirectAction(options)));
+                                              .toRedirectAction(Unsafe.<HttpClientImpl>cast(client).getOptions())));
     vertx.setTimer(TimeUnit.MINUTES.toMillis(2), t -> csrfTokens.remove(uuid));
     return this;
   }
@@ -123,15 +119,12 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
   }
 
   private SpotifyAuthService requestToken(String code, Handler<AsyncResult<JsonObject>> handler) {
-    String uri = Http.Query.of("/api/token")
+    String uri = Query.of("/api/token")
         .param(GRANT_TYPE, "authorization_code")
         .param(CODE, code)
         .param(REDIRECT_URI, getRedirectUri())
         .create();
-    HttpClientRequest request = client.post(uri, res -> handleRequestToken(res, handler))
-        .putHeader(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
-        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaders.APPLICATION_X_WWW_FORM_URLENCODED);
-    Http.logAndEndRequest(request);
+    logEnd(basicAuth(client.post(uri, res -> handleRequestToken(res, handler)), clientId, clientSecret));
     return this;
   }
 
@@ -142,7 +135,7 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
                             res.statusMessage()));
       return;
     }
-    res.bodyHandler(H.toLogJson(json -> tokens.put("dummy", new Token(json))));
+    res.bodyHandler(H.toLogJson(json -> tokens.put("dummy", JsonObj.mapTo(json, Token.class))));
     //todo replace dummy with actual user
   }
 
@@ -151,18 +144,18 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
   }
 
   private String getAuthorizationHeader() {
-    return Strings.base64("%s:%s", clientId, clientSecret);
+    return S.base64("%s:%s", clientId, clientSecret);
   }
 
   private SpotifyAuthService requestRefreshToken() {
-    String uri = Http.Query.of("/api/token")
+    String uri = Query.of("/api/token")
         .param(GRANT_TYPE, REFRESH_TOKEN)
         .param(REFRESH_TOKEN, tokens.get("dummy").getRefreshToken())
         .create();
     HttpClientRequest request = client.post(uri, this::handleRequestRefreshToken)
         .putHeader(HttpHeaders.AUTHORIZATION, getAuthorizationHeader())
         .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaders.APPLICATION_X_WWW_FORM_URLENCODED);
-    Http.logAndEndRequest(request);
+    logEnd(request);
     return this;
   }
 
@@ -171,8 +164,8 @@ public class SpotifyAuthServiceImpl implements SpotifyAuthService, HttpService {
       Logs.error("Spotify token refresh request failed: status {}, message {}", res.statusCode(), res.statusMessage());
       return;
     }
-    res.bodyHandler(H.toLogJson(json -> tokens
-        .compute("dummy", (key, previousToken) -> new Token(json)
-            .setRefreshToken(previousToken.getRefreshToken()))));
+    res.bodyHandler(H.toLogJson(json -> tokens.compute("dummy", (key, previousToken) -> JsonObj
+        .mapTo(json, Token.class)
+        .setRefreshToken(previousToken == null ? null : previousToken.getRefreshToken()))));
   }
 }

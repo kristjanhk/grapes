@@ -32,3 +32,4 @@ gradlew.bat
 /grapes.trace.db
 /modules/database/main/resources/database-secret.properties
 /.idea/dataSources.xml
+/modules/gateway/main/resources/zone-secret.json

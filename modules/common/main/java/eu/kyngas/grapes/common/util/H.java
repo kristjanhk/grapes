@@ -17,12 +17,17 @@
 
 package eu.kyngas.grapes.common.util;
 
+import eu.kyngas.grapes.common.entity.Callback;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
 import java.util.function.Consumer;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -42,5 +47,53 @@ public class H {
       Logs.error(4, "Failed to start {} module.", moduleName, ar.cause());
       vertx.close();
     });
+  }
+
+  public static Handler<AsyncResult<HttpServer>> handleServerStarted(Future<Void> fut) {
+    return ar -> {
+      if (ar.failed()) {
+        Logs.error("Failed to start http server.", ar.cause());
+        fut.fail(ar.cause());
+        return;
+      }
+      fut.complete();
+    };
+  }
+
+  public static ExHandler handler(Handler exHandler) {
+    return new ExHandler(Unsafe.cast(exHandler));
+  }
+
+  @RequiredArgsConstructor
+  public static class ExHandler {
+    private final Future<?> exFuture;
+    private String failMsg = "Unknown exception";
+
+    public ExHandler failMsg(String failMsg) {
+      this.failMsg = failMsg;
+      return this;
+    }
+
+    public <T> Future<T> handle(@NonNull Runnable runnable) {
+      return handle(v -> runnable.run());
+    }
+
+    public <T> Future<T> handle(@NonNull Consumer<T> consumer) {
+      return F.future(ar -> {
+        if (ar.failed()) {
+          exFuture.handle(F.fail(failMsg, ar.cause()));
+          return;
+        }
+        consumer.accept(ar.result());
+      });
+    }
+
+    public void handleException(@NonNull Callback.Paramless callback) {
+      try {
+        callback.exec();
+      } catch (Exception e) {
+        exFuture.handle(F.fail(failMsg, e));
+      }
+    }
   }
 }

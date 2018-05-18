@@ -28,7 +28,7 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class SpotifyMusicServiceImpl extends ProxyServiceImpl<SpotifyMusicService> implements SpotifyMusicService {
+public class SpotifyMusicServiceImpl extends ProxyServiceImpl implements SpotifyMusicService {
   private final JsonObject config;
   private final Vertx vertx = Ctx.vertx();
 

@@ -1,4 +1,6 @@
 {
   "production_host": "kyngas.eu",
-  "production_port": 443
+  "production_port": 443,
+  "dns_resolver_1": "1.1.1.1",
+  "dns_resolver_2": "8.8.8.8"
 }

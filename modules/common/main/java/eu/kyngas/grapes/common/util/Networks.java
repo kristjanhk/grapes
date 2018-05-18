@@ -17,6 +17,7 @@
 
 package eu.kyngas.grapes.common.util;
 
+import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.json.JsonObject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -84,5 +85,11 @@ public class Networks {
 
   private String toFullUrl(String host, int port) {
     return String.format("http%s://%s%s", port == 443 ? "s" : "", host, port == DEFAULT_PORT ? ":" + DEFAULT_PORT : "");
+  }
+
+  public static AddressResolverOptions getDnsResolverOptions(JsonObject config) {
+    String cloudflareResolver = config.getString("dns_resolver_1", "1.1.1.1");
+    String googleResolver = config.getString("dns_resolver_2", "8.8.8.8");
+    return new AddressResolverOptions().addServer(cloudflareResolver).addServer(googleResolver);
   }
 }

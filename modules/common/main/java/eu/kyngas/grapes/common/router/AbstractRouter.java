@@ -19,11 +19,16 @@ package eu.kyngas.grapes.common.router;
 
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.Logs;
+import eu.kyngas.grapes.common.util.N;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.impl.RouterImpl;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -31,9 +36,26 @@ import java.util.function.Consumer;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public abstract class AbstractRouter extends RouterImpl {
+  private final Map<String, Route> routes = new HashMap<>();
 
   public AbstractRouter() {
     super(Ctx.vertx());
+    route().handler(BodyHandler.create());
+  }
+
+  public void addRoute(String url, String response) { // TODO: 2.05.2018 different responses, http codes...
+    if (hasRoute(url)) {
+      Logs.warn("Router {} already contains route with url {}.", getClass().getSimpleName(), url);
+    }
+    routes.putIfAbsent(url, route(url).handler(ctx -> Status.ok(ctx, response)));
+  }
+
+  public void removeRoute(String url) {
+    N.safe(routes.remove(url), Route::remove);
+  }
+
+  protected boolean hasRoute(String url) {
+    return url != null && routes.containsKey(url);
   }
 
   protected <T> Handler<AsyncResult<T>> handler(RoutingContext ctx, Consumer<T> consumer) {

@@ -24,16 +24,15 @@ import eu.kyngas.grapes.common.util.Config;
 import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.H;
 import eu.kyngas.grapes.common.util.Logs;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static eu.kyngas.grapes.common.util.Config.isRunningFromJar;
+import static eu.kyngas.grapes.common.util.H.handleServerStarted;
 import static eu.kyngas.grapes.common.util.Networks.*;
 
 /**
@@ -71,17 +70,6 @@ public class MusicVerticle extends Verticle {
                   .listen(config().getInteger(HTTP_PORT, 8085),
                           config().getString(HTTP_HOST, DEFAULT_HOST),
                           handleServerStarted(future));
-  }
-
-  private Handler<AsyncResult<HttpServer>> handleServerStarted(Future<Void> future) {
-    return ar -> {
-      if (ar.failed()) {
-        Logs.error("Failed to start http server", ar.cause());
-        future.fail(ar.cause());
-        return;
-      }
-      future.complete();
-    };
   }
 
   @Override

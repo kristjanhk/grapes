@@ -23,23 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class StringsTest {
+public class STest {
 
   @Test
   public void toCamelCase() {
-    assertEquals("camelCase", Strings.toCamelCase("camel_case"));
-    assertEquals("camelCaseLong", Strings.toCamelCase("camel_case_long"));
-    assertEquals("camelCase", Strings.toCamelCase("camel_case_"));
-    assertEquals("camelCase", Strings.toCamelCase("_camel_case"));
-    assertEquals("camelCase", Strings.toCamelCase("camel__case"));
-    assertEquals("camelCase", Strings.toCamelCase("camelCase"));
+    assertEquals("camelCase", S.toCamelCase("camel_case"));
+    assertEquals("camelCaseLong", S.toCamelCase("camel_case_long"));
+    assertEquals("camelCase", S.toCamelCase("camel_case_"));
+    assertEquals("camelCase", S.toCamelCase("_camel_case"));
+    assertEquals("camelCase", S.toCamelCase("camel__case"));
+    assertEquals("camelCase", S.toCamelCase("camelCase"));
   }
 
   @Test
   public void toSnakeCase() {
-    assertEquals("snake_case", Strings.toSnakeCase("snakeCase"));
-    assertEquals("snake_case_long", Strings.toSnakeCase("snakeCaseLong"));
-    assertEquals("snake_case", Strings.toSnakeCase("SnakeCase"));
-    assertEquals("snake_case", Strings.toSnakeCase("snake_case"));
+    assertEquals("snake_case", S.toSnakeCase("snakeCase"));
+    assertEquals("snake_case_long", S.toSnakeCase("snakeCaseLong"));
+    assertEquals("snake_case", S.toSnakeCase("SnakeCase"));
+    assertEquals("snake_case", S.toSnakeCase("snake_case"));
   }
 }

@@ -19,14 +19,14 @@ package eu.kyngas.grapes.music.spotify;
 
 import eu.kyngas.grapes.common.entity.JsonObj;
 import eu.kyngas.grapes.common.entity.Pair;
-import eu.kyngas.grapes.proxy.ProxyServiceImpl;
 import eu.kyngas.grapes.common.util.C;
 import eu.kyngas.grapes.common.util.Config;
+import eu.kyngas.grapes.common.util.Ctx;
 import eu.kyngas.grapes.common.util.F;
 import eu.kyngas.grapes.common.util.Logs;
-import eu.kyngas.grapes.common.util.Networks;
 import eu.kyngas.grapes.common.util.Unsafe;
 import eu.kyngas.grapes.music.util.Dbus;
+import eu.kyngas.grapes.proxy.ProxyServiceImpl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -43,7 +43,7 @@ import org.freedesktop.dbus.exceptions.DBusException;
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalService> implements SpotifyLocalService {
+public class SpotifyLocalServiceImpl extends ProxyServiceImpl implements SpotifyLocalService {
   private static final String DBUS_SERVICE_SPOTIFY = "org.mpris.MediaPlayer2.spotify";
   private static final String DBUS_SERVICE_PLAYER = "org.mpris.MediaPlayer2.Player";
   private static final String DBUS_MPRIS_PLAYER = "/org/mpris/MediaPlayer2";
@@ -174,7 +174,7 @@ public class SpotifyLocalServiceImpl extends ProxyServiceImpl<SpotifyLocalServic
   }
 
   private <T> void checkConnection(Handler<AsyncResult<T>> handler, boolean succeedFast, Runnable ifConnected) {
-    if (!Networks.getInstance().isProduction()) {
+    if (!Ctx.isProductionMode()) {
       handler.handle(F.fail("Spotify cannot be controlled in a development environment."));
       return;
     }
