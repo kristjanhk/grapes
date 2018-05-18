@@ -40,9 +40,12 @@ public class Audit {
   }
 
   public static void checkIllegalColumnNames(List<Column> columns, String... names) {
-    columns.forEach(column -> Arrays.stream(names).filter(name -> name.equals(column.getName())).forEach(name -> {
-      throw new IllegalArgumentException(String.format("Regular table cannot contain column with name '%s'", name));
-    }));
+    columns.forEach(column -> Arrays.stream(names)
+        .filter(name -> name.equals(column.getName()))
+        .findFirst()
+        .ifPresent(name -> {
+          throw new IllegalArgumentException(String.format("Regular table cannot contain column with name '%s'", name));
+        }));
   }
 
   public static String getAuditTableName(String tableName) {

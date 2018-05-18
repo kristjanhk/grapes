@@ -41,14 +41,14 @@ import static org.jooq.impl.DSL.*;
  */
 @SuppressWarnings("unused")
 public class AuditTableCreator {
-  private static final String INTEGER = "INTEGER";
+  private static final String BIGINT = "BIGINT";
   private static final String AUTO_INC = "AUTO_INCREMENT";
 
   public static void createAuditTable(Connection conn, String tableName) throws SQLException {
     DSLContext dsl = Jooq.getDsl(conn);
     tableName = tableName.toUpperCase(Locale.ENGLISH);
-    createTable(conn, dsl, tableName);
     createSysFields(dsl, tableName);
+    createTable(conn, dsl, tableName);
   }
 
   private static void createTable(Connection conn, DSLContext dsl, String tableName) throws SQLException {
@@ -73,7 +73,7 @@ public class AuditTableCreator {
   }
 
   private static String addPrimaryKeyAutoIncrement(String sql) {
-    String pattern = String.format("%s %s ", ID_A, INTEGER);
+    String pattern = String.format("%s %s ", ID_A, BIGINT.toLowerCase());
     return sql.replaceFirst(pattern, pattern + AUTO_INC + " ");
   }
 

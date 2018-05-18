@@ -53,6 +53,5 @@ public enum SqlDefault {
         .findFirst()
         .map(SqlDefault::getDefaultValue)
         .orElse(null);
-
   }
 }

@@ -62,13 +62,12 @@ public class Jdbc {
 
   public static List<Column> getColumns(Connection conn, String tableName) throws SQLException {
     ResultSet columnResultSet = conn.getMetaData().getColumns(null, SCHEMA, tableName, null);
-    Jdbc.SqlFunction<ResultSet, Column> columnMapper = row -> {
+    return Jdbc.resultSetToList(columnResultSet, row -> {
       String name = row.getString(4);
       String typeName = row.getString(6);
       int typeLength = row.getInt(7);
       DataType<?> type = DefaultDataType.getDataType(SQLDialect.H2, typeName).length(typeLength);
       return new Column(name, type);
-    };
-    return Jdbc.resultSetToList(columnResultSet, columnMapper);
+    });
   }
 }

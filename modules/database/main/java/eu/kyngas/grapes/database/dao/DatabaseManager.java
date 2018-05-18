@@ -18,7 +18,6 @@
 package eu.kyngas.grapes.database.dao;
 
 import eu.kyngas.grapes.common.util.Ctx;
-import eu.kyngas.grapes.common.util.Logs;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import java.sql.SQLException;
@@ -69,22 +68,16 @@ public class DatabaseManager {
   }
 
   private void runMigration(Future<Void> future) {
-    Ctx.blocking(fut -> {
-      try {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(dataSource);
-        flyway.setSchemas(config.getString("schema"));
-        flyway.setLocations(config.getString("location_production"));
-        flyway.setOutOfOrder(config.getBoolean("out_of_order"));
-        flyway.setSqlMigrationPrefix(config.getString("prefix"));
-        flyway.setSqlMigrationSeparator(config.getString("separator"));
-        flyway.migrate();
-      } catch (Exception e) {
-        Logs.error("Flyway migration failed.", e);
-        fut.fail(e);
-        return;
-      }
-      fut.complete();
-    }, future);
+    future.setHandler(Ctx.blocking(() -> {
+      Flyway flyway = new Flyway();
+      flyway.setDataSource(dataSource);
+      flyway.setSchemas(config.getString("schema"));
+      flyway.setLocations(config.getString("location_production"));
+      flyway.setOutOfOrder(config.getBoolean("out_of_order"));
+      flyway.setSqlMigrationPrefix(config.getString("prefix"));
+      flyway.setSqlMigrationSeparator(config.getString("separator"));
+      flyway.migrate();
+    }));
+
   }
 }
