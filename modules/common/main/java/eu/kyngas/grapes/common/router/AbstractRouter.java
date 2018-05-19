@@ -50,6 +50,10 @@ public abstract class AbstractRouter extends RouterImpl {
     routes.putIfAbsent(url, route(url).handler(ctx -> Status.ok(ctx, response)));
   }
 
+  protected void addRoute(Route route) {
+    routes.putIfAbsent(route.getPath(), route);
+  }
+
   public void removeRoute(String url) {
     N.safe(routes.remove(url), Route::remove);
   }

@@ -1,4 +1,12 @@
 {
   "http_host": "localhost",
-  "http_port": 8080
+  "http_port": 8080,
+  "virtual_hosts": [
+    {
+      "name": "moviediary",
+      "host": "localhost",
+      "port": 8081,
+      "domains": ["moviediary.eu", "movies.kyngas.eu"]
+    }
+  ]
 }

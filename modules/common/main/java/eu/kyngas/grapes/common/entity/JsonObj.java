@@ -17,6 +17,8 @@
 
 package eu.kyngas.grapes.common.entity;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import eu.kyngas.grapes.common.util.N;
 import eu.kyngas.grapes.common.util.S;
 import io.vertx.core.buffer.Buffer;
@@ -46,6 +48,9 @@ public class JsonObj extends JsonObject {
   private static final Map<Class, Function<String, Object>> PARSER_MAP = new HashMap<>();
 
   static {
+    Json.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    Json.mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+
     PARSER_MAP.put(Integer.class, input -> safe(() -> Integer.parseInt(input)));
     PARSER_MAP.put(Long.class, input -> safe(() -> Long.parseLong(input)));
     PARSER_MAP.put(Double.class, input -> safe(() -> Double.parseDouble(input)));

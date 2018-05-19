@@ -56,7 +56,7 @@ public class GatewayVerticle extends AbstractVerticle {
     acmeService = AcmeService.create();
     HttpServiceImpl.createHttpService(new MainRouter(), config()).compose(service -> {
       httpService = service;
-      return acmeService.renewCertificate("kyngas.eu");
+      return acmeService.renewCertificate("empty");
     }).setHandler(future);
   }
 

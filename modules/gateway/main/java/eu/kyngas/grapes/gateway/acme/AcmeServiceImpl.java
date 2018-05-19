@@ -82,7 +82,7 @@ public class AcmeServiceImpl implements AcmeService {
                                                  .getJsonArray(domainKey, new JsonArray())
                                                  .getList());
     if (domains.isEmpty()) {
-      Logs.warn("No domains found for domainKey {}.", domainKey);
+      Logs.warn("No domains found for domainKey '{}'.", domainKey);
       return F.success();
     }
 
